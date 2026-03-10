@@ -1,0 +1,23 @@
+services:
+  redis-url:
+    image: redis:latest
+    container_name: redis-url
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  postgresql-url:
+    image: postgres:latest
+    container_name: postgresql-url
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: url_shortener
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+volumes:
+  redis-data:
+  postgresql-data:
