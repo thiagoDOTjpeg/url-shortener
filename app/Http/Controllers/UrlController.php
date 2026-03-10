@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUrlRequest;
+use App\Jobs\GenerateQrCode;
 use App\Models\UrlShortened;
 use Base62\Base62;
 use Illuminate\Http\JsonResponse;
@@ -28,6 +29,8 @@ class UrlController extends Controller
         $url->id = $slug;
         $url->expires_at = now()->addDays(7);
         $url->save();
+
+        GenerateQrCode::dispatch($url);
 
         return response()->json($url, 201);
     }

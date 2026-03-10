@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create("url_shorteneds", function (Blueprint $table) {
             $table->string("id")->primary();
             $table->string("original_url")->index();
-            $table->string("qr_code")->nullable();
+            $table->text("qr_code")->nullable();
             $table->timestamp("expires_at")->index();
             $table->timestamps();
         });
