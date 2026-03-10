@@ -8,7 +8,7 @@ services:
       - redis-data:/data
 
   postgresql-url:
-    image: postgres:latest
+    image: postgres:18-alpine
     container_name: postgresql-url
     environment:
       POSTGRES_USER: user
