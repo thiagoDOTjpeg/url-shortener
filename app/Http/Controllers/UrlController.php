@@ -14,6 +14,8 @@ class UrlController extends Controller
     public function __construct(private readonly Base62 $base62) {}
 
     public function show($id) {
+        $url = UrlShortened::findOrFail($id);
+        return redirect($url->original_url);
     }
 
     /**

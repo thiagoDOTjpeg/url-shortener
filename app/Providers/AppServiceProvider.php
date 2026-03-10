@@ -13,7 +13,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(Base62::class, function () {
+            return new Base62();
+        });
     }
 
     /**
