@@ -22,14 +22,11 @@ class AuthController extends Controller
             "password" => Hash::make($data["password"]),
         ]);
 
-        $token = $user->createToken("auth_token")->plainTextToken;
+        Auth::login($user);
 
+        $request->session()->regenerate();
 
-        return response()->json([
-            "message" => "User registered successfully",
-            "token" => $token,
-            "user" => $user,
-        ],201);
+        return redirect()->route("dashboard.home");
     }
 
     public function me(Request $request)
