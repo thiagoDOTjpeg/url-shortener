@@ -11,4 +11,3 @@ Route::middleware("auth:sanctum")->group(function () {
 });
 
 Route::get("/{slug}", [UrlController::class, "show"]);
-Route::post("/register", [AuthController::class, "register"]);

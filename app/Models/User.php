@@ -3,11 +3,18 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
+use Eloquent;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+/**
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UrlShortened newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UrlShortened newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UrlShortened query()
+ * @mixin Eloquent
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */

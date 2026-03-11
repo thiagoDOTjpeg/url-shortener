@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Eloquent;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UrlShortened newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UrlShortened newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UrlShortened query()
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class UrlShortened extends Model
 {
