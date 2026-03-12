@@ -1,4 +1,35 @@
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: url-shortener-app
+    ports:
+      - "8080:80"
+    environment:
+      APP_NAME: "URL Shortener"
+      APP_ENV: production
+      APP_KEY: "${APP_KEY}"
+      APP_DEBUG: "false"
+      APP_URL: "${APP_URL:-http://localhost:8080}"
+      LOG_CHANNEL: stderr
+      LOG_LEVEL: error
+      DB_CONNECTION: pgsql
+      DB_HOST: postgresql-url
+      DB_PORT: 5432
+      DB_DATABASE: url_shortener
+      DB_USERNAME: user
+      DB_PASSWORD: password
+      SESSION_DRIVER: database
+      QUEUE_CONNECTION: redis
+      CACHE_STORE: redis
+      REDIS_HOST: redis-url
+      REDIS_PORT: 6379
+    depends_on:
+      - postgresql-url
+      - redis-url
+    restart: unless-stopped
+
   redis-url:
     image: redis:latest
     container_name: redis-url
