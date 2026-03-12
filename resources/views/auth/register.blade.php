@@ -1,16 +1,7 @@
-<x-layout>
+<x-layouts.auth>
     <x-slot:title>Criar conta - Shortly</x-slot:title>
 
     <div class="min-h-screen bg-background flex flex-col">
-        <header class="border-b border-border">
-            <div class="mx-auto max-w-5xl px-6 py-4">
-                <a href="{{ url('/') }}" class="flex items-center gap-2 w-fit">
-                    <x-lucide-link-2 class="h-5 w-5" />
-                    <span class="font-medium">Shortify</span>
-                </a>
-            </div>
-        </header>
-
         <main class="flex-1 flex items-center justify-center px-6 py-12">
             <div class="w-full max-w-sm">
                 <div class="mb-8">
@@ -98,4 +89,4 @@
             </div>
         </main>
     </div>
-</x-layout>
+</x-layouts.auth>

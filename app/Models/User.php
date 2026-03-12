@@ -10,9 +10,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UrlShortened newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UrlShortened newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UrlShortened query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Url newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Url newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Url query()
  * @mixin Eloquent
  */
 class User extends Authenticatable
