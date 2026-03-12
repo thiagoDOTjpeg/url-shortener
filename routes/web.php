@@ -35,5 +35,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/shorten', [UrlController::class, 'store'])->name('url.store');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get("/urls", [UrlController::class, 'index'])->name('url.index');
+    Route::delete("/{slug}", [UrlController::class, 'destroy'])->name('url.destroy');
 });
 

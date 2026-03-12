@@ -14,7 +14,7 @@ class GenerateQrCode implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(private Url $urlShortened)
+    public function __construct(private readonly Url $urlShortened)
     {
 
     }
@@ -25,7 +25,7 @@ class GenerateQrCode implements ShouldQueue
     public function handle(): void
     {
         $slug = $this->urlShortened->id;
-        $url = config("app.url") . "/" . $slug;
+        $url = config("app.url") . "/r/" . $slug . "?from=qrcode";
         $qrcode = QrCode::generate($url);
         $this->urlShortened->qr_code = $qrcode;
         $this->urlShortened->save();

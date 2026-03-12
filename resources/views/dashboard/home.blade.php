@@ -13,7 +13,9 @@
     <div class="mx-auto max-w-5xl px-6 py-8">
         <div x-data="{
             isDialogOpen: false,
-            qrCodeUrl: null,
+            isDeleteDialogOpen: false,
+            deleteId: null,
+            qrCodeSvg: null,
             copiedId: null,
             clicks: {{ json_encode($links->pluck('click_count', 'id')) }},
             copy(text, id) {
@@ -97,7 +99,10 @@
                                         <p class="text-xs text-muted-foreground">Criado em {{ $link->created_at->format('d/m/Y') }}</p>
                                     </div>
                                     <div class="flex items-center gap-1">
-                                        <x-button variant="ghost" size="icon" @click="qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ $baseUrl }}/r/{{ $link->id }}?from=qrcode'">
+                                        <x-button variant="ghost"
+                                                  size="icon"
+                                                  x-on:click='qrCodeSvg = {{ \Illuminate\Support\Js::from($link->qr_code) }}'
+                                        >
                                             <x-lucide-qr-code class="h-4 w-4" />
                                         </x-button>
 
@@ -105,13 +110,9 @@
                                             <x-lucide-external-link class="h-4 w-4" />
                                         </x-button>
 
-                                        <form action="#" method="POST" onsubmit="return confirm('Excluir este link?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="p-2 text-muted-foreground hover:text-destructive transition-colors">
-                                                <x-lucide-trash-2 class="h-4 w-4" />
-                                            </button>
-                                        </form>
+                                        <button @click="isDeleteDialogOpen = true; deleteId = '{{ $link->id }}'" class="p-2 text-muted-foreground hover:text-destructive transition-colors">
+                                            <x-lucide-trash-2 class="h-4 w-4" />
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -138,10 +139,6 @@
                             })
                             .then(r => {
                                 if (!r.ok) return r.json().then(e => { console.error(e); throw e; });
-                                return r.json();
-                            })
-                            .then(data => {
-                                console.log('Criado:', data);
                                 isDialogOpen = false;
                                 window.location.reload();
                             })
@@ -159,14 +156,48 @@
                 </div>
             </div>
 
-            <div x-show="qrCodeUrl" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" x-cloak x-transition>
-                <div class="bg-background border border-border rounded-lg p-6 max-w-sm w-full relative" @click.outside="qrCodeUrl = null">
-                    <button @click="qrCodeUrl = null" class="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
+            <div x-show="qrCodeSvg" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" x-cloak x-transition>
+                <div class="bg-background border border-border rounded-lg p-6 max-w-sm w-full relative" @click.outside="qrCodeSvg = null">
+                    <button @click="qrCodeSvg = null" class="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
                         <x-lucide-x class="h-5 w-5" />
                     </button>
                     <h3 class="text-lg font-medium mb-2 text-center">QR Code</h3>
-                    <div class="bg-white p-4 rounded-lg flex items-center justify-center border border-border mt-4">
-                        <img :src="qrCodeUrl" alt="QR Code" class="w-48 h-48">
+                    <div class="bg-white p-4 rounded-lg border border-border mt-4 flex items-center justify-center" x-html="qrCodeSvg"></div>
+                </div>
+            </div>
+
+            <div x-show="isDeleteDialogOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" x-cloak x-transition>
+                <div class="flex flex-col bg-background border border-border rounded-lg p-6 max-w-lg w-full" @click.outside="isDeleteDialogOpen = false">
+                    <div class="flex justify-end pb-2">
+                        <button @click="isDeleteDialogOpen = false"  class="text-muted-foreground hover:text-foreground">
+                            <x-lucide-x class="h-5 w-5" />
+                        </button>
+                    </div>
+                    <div class="flex flex-col">
+                        <p class="font-semibold">Deseja realmente excluir este link? Está ação é irreversível</p>
+                        <form @submit.prevent="
+                         fetch(`/${deleteId}`, {
+                         method: 'DELETE',
+                         headers: {
+                         'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                         'Accept': 'application/json'
+                         }
+                         })
+                         .then(r => {
+                         if (!r.ok) throw new Error('Erro ao excluir');
+                         isDeleteDialogOpen = false;
+                         deleteId = null;
+                         window.location.reload();
+                         })
+                         .catch(() => {})
+                        " class="flex justify-between gap-3 mt-6">
+                            <x-button variant="outline" @click="isDeleteDialogOpen = false" class=" text-muted-foreground hover:text-foreground">
+                                <p>Cancelar</p>
+                            </x-button>
+                            <x-button variant="destructive" type="submit"  class="text-muted-foreground hover:text-foreground">
+                            <p>Excluir</p>
+                        </x-button>
+                        </form>
                     </div>
                 </div>
             </div>

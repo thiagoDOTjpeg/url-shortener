@@ -16,6 +16,14 @@ class UrlController extends Controller
 
     public function __construct(private readonly Base62 $base62) {}
 
+    public function destroy($slug)
+    {
+        $url = Url::where('id', $slug)->where('user_id', auth()->id())->firstOrFail();
+        $url->delete();
+
+        return response()->json(['message' => 'URL deleted successfully']);
+    }
+
     public function show($slug, Request $request) {
         $url = Url::findOrFail($slug);
 
