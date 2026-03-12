@@ -106,6 +106,10 @@
                                             <x-lucide-qr-code class="h-4 w-4" />
                                         </x-button>
 
+                                        <x-button variant="ghost" size="icon" @click="window.location.href = '{{ route('dashboard.analytics', $link->id) }}'">
+                                            <x-lucide-bar-chart-3 class="h-4 w-4" />
+                                        </x-button>
+
                                         <x-button variant="ghost" size="icon" @click="openLink('{{ $link->id }}', '{{ $baseUrl }}/r/{{ $link->id }}')">
                                             <x-lucide-external-link class="h-4 w-4" />
                                         </x-button>

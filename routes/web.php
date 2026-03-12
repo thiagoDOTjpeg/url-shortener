@@ -30,6 +30,7 @@ Route::get('/r/{slug}', [UrlController::class, 'show'])->name('url.redirect');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard/home', [UrlController::class, 'index'])->name('dashboard.home');
+    Route::get('/dashboard/analytics/${slug}', [UrlController::class, 'analytics'])->name('dashboard.analytics');
 
     Route::get('/me', [AuthController::class, 'me'])->name('me');
     Route::post('/shorten', [UrlController::class, 'store'])->name('url.store');

@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -34,4 +35,9 @@ class User extends Authenticatable
     protected $casts = [
         "password" => "hashed",
     ];
+
+    public function urls(): HasMany
+    {
+        return $this->hasMany(Url::class);
+    }
 }

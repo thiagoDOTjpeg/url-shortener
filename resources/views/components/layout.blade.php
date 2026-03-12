@@ -20,5 +20,7 @@
     </head>
     <body class="antialiased">
         {{ $slot }}
-</body>
+
+        @stack('scripts')
+    </body>
 </html>
