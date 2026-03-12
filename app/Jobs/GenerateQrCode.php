@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\UrlShortened;
+use App\Models\Url;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -14,7 +14,7 @@ class GenerateQrCode implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(private UrlShortened $urlShortened)
+    public function __construct(private Url $urlShortened)
     {
 
     }
