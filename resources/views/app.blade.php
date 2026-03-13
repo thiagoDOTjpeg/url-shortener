@@ -17,11 +17,11 @@
                         Desenvolvido como projeto de estudo utilizando tecnologias modernas.
                     </p>
                     <div class="flex items-center gap-4">
-                        <x-button href="{{ route('register') }}">
+                        <x-button href="{{ route('register.form') }}">
                             Começar agora
                             <x-lucide-arrow-right class="ml-2 h-4 w-4" />
                         </x-button>
-                        <x-button variant="outline" href="{{ route('login')  }}">
+                        <x-button variant="outline" href="{{ route('login.form')  }}">
                             Já tenho conta
                         </x-button>
                     </div>
@@ -113,7 +113,7 @@
                     <p class="text-muted-foreground mb-8">
                         Crie sua conta gratuitamente e comece a encurtar seus links.
                     </p>
-                    <x-button href="{{ route('register') }}">
+                    <x-button href="{{ route('register.form') }}">
                         Criar conta gratuita
                         <x-lucide-arrow-right class="ml-2 h-4 w-4" />
                     </x-button>

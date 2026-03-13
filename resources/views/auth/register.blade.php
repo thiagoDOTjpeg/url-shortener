@@ -82,7 +82,7 @@
 
                 <p class="mt-6 text-center text-sm text-muted-foreground">
                     Já tem uma conta?
-                    <a href="{{ route('login') }}" class="text-foreground hover:underline font-medium">
+                    <a href="{{ route('login.form') }}" class="text-foreground hover:underline font-medium">
                         Entrar
                     </a>
                 </p>

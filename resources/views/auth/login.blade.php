@@ -62,7 +62,7 @@
 
                 <p class="mt-6 text-center text-sm text-muted-foreground">
                     Não tem uma conta?
-                    <a href="{{ route('register')  }}" class="text-foreground hover:underline font-medium">
+                    <a href="{{ route('register.form')  }}" class="text-foreground hover:underline font-medium">
                         Criar conta
                     </a>
                 </p>

@@ -7,10 +7,10 @@
                     <span class="font-medium">Shortly</span>
                 </a>
                 <div class="flex items-center gap-4">
-                    <a href="{{ route('login') }}" class="cursor-pointer text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    <a href="{{ route('login.form') }}" class="cursor-pointer text-sm text-muted-foreground hover:text-foreground transition-colors">
                         Entrar
                     </a>
-                    <x-button href="{{ route('register') }}" size="sm">
+                    <x-button href="{{ route('register.form') }}" size="sm">
                         Criar conta
                     </x-button>
                 </div>

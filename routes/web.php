@@ -15,11 +15,11 @@ Route::get('/dashboard', function () {
 Route::middleware('guest')->group(function () {
     Route::get('/login', function () {
         return view('auth.login');
-    })->name('login');
+    })->name('login.form');
 
     Route::get('/register', function () {
         return view('auth.register');
-    })->name('register');
+    })->name('register.form');
 
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/login', [AuthController::class, 'login'])->name('login');
