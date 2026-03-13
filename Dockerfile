@@ -36,6 +36,16 @@ WORKDIR /app
 
 COPY composer.json composer.lock ./
 
+RUN apk add --no-cache \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    postgresql-dev \
+    libxml2-dev \
+    curl-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd pdo_pgsql curl dom xml
+
 RUN composer install \
     --no-dev \
     --no-interaction \
