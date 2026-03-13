@@ -1,4 +1,4 @@
-FROM php:8.2-cli-alpine AS deps
+FROM php:8.4-cli-alpine AS deps
 
 RUN apk add --no-cache \
     libpng-dev \
@@ -68,7 +68,7 @@ COPY public/ public/
 
 RUN npm run build
 
-FROM php:8.2-fpm-alpine AS runtime
+FROM php:8.4-fpm-alpine AS runtime
 
 LABEL maintainer="thiagogritti"
 LABEL description="URL Shortener – Laravel 12 production image"
