@@ -65,10 +65,10 @@ jobs:
       - name: Criar tags da imagem
         run: |
           docker tag "$LOCAL_IMAGE_NAME:${GITHUB_SHA}" "$IMAGE_NAME:${GITHUB_SHA}"
-          docker tag "$LOCAL_IMAGE_NAME:${GITHUB_SHA}" "$IMAGE_NAME:latest"
+          docker tag "$LOCAL_IMAGE_NAME:${GITHUB_SHA}" "$IMAGE_NAME:main"
 
       - name: Push para o Docker Hub
         run: |
           docker push "$IMAGE_NAME:${GITHUB_SHA}"
-          docker push "$IMAGE_NAME:latest"
+          docker push "$IMAGE_NAME:main"
 
