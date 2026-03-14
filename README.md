@@ -43,6 +43,36 @@ Antes de rodar, configure o banco no `.env` com `DB_CONNECTION=pgsql` e as crede
 composer test
 ```
 
+## CI/CD com GitHub Actions
+
+O workflow em [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) roda em runner `self-hosted` e executa dois jobs:
+
+- `build`: faz o build da imagem Docker do projeto e salva a imagem como artefato do workflow.
+- `push`: baixa a imagem gerada, faz login no Docker Hub e publica duas tags da mesma imagem.
+
+### Secrets e variaveis necessarios
+
+Configure no repositorio:
+
+- `DOCKERHUB_USERNAME`: usuario do Docker Hub.
+- `DOCKERHUB_TOKEN`: token de acesso do Docker Hub.
+- `DOCKERHUB_REPOSITORY` (opcional, em **Variables**): nome do repositorio no Docker Hub. Se nao for definido, o workflow usa o nome do repositorio GitHub.
+
+### Tags publicadas
+
+Cada execucao em `main` publica:
+
+- `seu-usuario/seu-repositorio:${github.sha}`
+- `seu-usuario/seu-repositorio:latest`
+
+### Requisitos do runner self-hosted
+
+O runner precisa ter:
+
+- Docker instalado e funcional
+- acesso de rede para baixar dependencias do build
+- permissao para usar `docker build`, `docker save`, `docker load` e `docker push`
+
 ## Observacoes
 
 - Este repositorio e focado em aprendizado e experimentacao.
