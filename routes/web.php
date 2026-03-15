@@ -1,16 +1,34 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UrlController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 Route::get('/', function () {
-    return Auth::check() ? redirect()->route("dashboard.home") : view('app');
+    return view('app');
 });
 
-Route::get('/dashboard', function () {
-    return Auth::check() ? redirect()->route('dashboard.home') : redirect()->route('login');
+Route::middleware('auth')->get('/dashboard', function () {
+    return redirect()->route('dashboard.home');
 });
+
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+
+    return redirect('/dashboard/home');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+
+    return back()->with('message', 'Verification link sent!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', function () {
@@ -28,14 +46,19 @@ Route::middleware('guest')->group(function () {
 Route::get('/r/{slug}', [UrlController::class, 'show'])->name('url.redirect');
 
 
-Route::middleware('auth')->group(function () {
-    Route::get('/dashboard/home', [UrlController::class, 'index'])->name('dashboard.home');
-    Route::get('/dashboard/analytics/${slug}', [UrlController::class, 'analytics'])->name('dashboard.analytics');
+Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () {
+
+    Route::get('/home', [UrlController::class, 'index'])->name('dashboard.home');
+
+    Route::get('/analytics/{slug}', [UrlController::class, 'analytics'])
+        ->name('dashboard.analytics');
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/me', [AuthController::class, 'me'])->name('me');
-    Route::post('/shorten', [UrlController::class, 'store'])->name('url.store');
+    Route::post('/urls/shorten', [UrlController::class, 'store'])->name('url.store');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get("/urls", [UrlController::class, 'index'])->name('url.index');
-    Route::delete("/{slug}", [UrlController::class, 'destroy'])->name('url.destroy');
+    Route::delete("/urls/{slug}", [UrlController::class, 'destroy'])->name('url.destroy');
 });
 

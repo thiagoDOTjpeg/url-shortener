@@ -72,7 +72,10 @@ class UrlController extends Controller
 
     public function analytics(Request $request, $slug)
     {
-        $link = Url::where('id', $slug)->where('user_id', auth()->id())->firstOrFail();
+        $link = auth()->user()
+            ->urls()
+            ->latest()
+            ->get();
         $days = $request->query('days', 7);
         $startDate = now()->subDays($days);
 

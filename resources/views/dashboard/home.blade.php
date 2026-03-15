@@ -132,7 +132,7 @@
                         <p class="text-sm text-muted-foreground">Cole a URL que deseja encurtar.</p>
                     </div>
                     <form @submit.prevent="
-                            fetch('/shorten', {
+                            fetch('/urls/shorten', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -180,18 +180,18 @@
                     <div class="flex flex-col">
                         <p class="font-semibold">Deseja realmente excluir este link? Está ação é irreversível</p>
                         <form @submit.prevent="
-                         fetch(`/${deleteId}`, {
+                         fetch(`/urls/${deleteId}`, {
                          method: 'DELETE',
                          headers: {
-                         'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-                         'Accept': 'application/json'
+                             'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                             'Accept': 'application/json'
                          }
                          })
                          .then(r => {
-                         if (!r.ok) throw new Error('Erro ao excluir');
-                         isDeleteDialogOpen = false;
-                         deleteId = null;
-                         window.location.reload();
+                             if (!r.ok) throw new Error('Erro ao excluir');
+                             isDeleteDialogOpen = false;
+                             deleteId = null;
+                             window.location.reload();
                          })
                          .catch(() => {})
                         " class="flex justify-between gap-3 mt-6">
