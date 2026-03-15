@@ -5,6 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UrlController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\RedirectController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AnalyticsController;
+
 
 Route::get('/', function () {
     return view('app');
@@ -43,14 +47,14 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
 });
 
-Route::get('/r/{slug}', [UrlController::class, 'show'])->name('url.redirect');
+Route::get('/r/{slug}', RedirectController::class)->name('url.redirect');
 
 
 Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () {
 
-    Route::get('/home', [UrlController::class, 'index'])->name('dashboard.home');
+    Route::get('/home', [DashboardController::class, 'home'])->name('dashboard.home');
 
-    Route::get('/analytics/{slug}', [UrlController::class, 'analytics'])
+    Route::get('/analytics/{slug}', [AnalyticsController::class, 'show'])
         ->name('dashboard.analytics');
 });
 
