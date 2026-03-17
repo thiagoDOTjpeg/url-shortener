@@ -14,9 +14,9 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 **Prioridade:** Alta
 
 ### 1.1 Confirmacao de E-mail
-- [ ] Implementar `implements MustVerifyEmail` no model `User`.
-- [ ] Proteger areas autenticadas para usuarios com e-mail verificado.
-- [ ] Adicionar aviso na UI para reenvio de confirmacao.
+- [x] Implementar `implements MustVerifyEmail` no model `User`.
+- [x] Proteger areas autenticadas para usuarios com e-mail verificado.
+- [x] Adicionar aviso na UI para reenvio de confirmacao.
 - [ ] Criar testes de feature para fluxo de verificacao.
 
 ### 1.2 Gestao de Senhas (Reset Password)

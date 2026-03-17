@@ -49,7 +49,7 @@
                         <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
                         @enderror
                         <div class="flex items-center justify-end">
-                            <a class="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                            <a href="{{ route('password.request')  }}" class="text-xs text-muted-foreground hover:text-foreground transition-colors">
                                 Esqueceu a senha?
                             </a>
                         </div>
