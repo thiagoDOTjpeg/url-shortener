@@ -29,7 +29,7 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 - [x] Limitar criacao de URLs (exemplo: 5/min por usuario).
 - [x] Proteger rota de redirecionamento `/r/{slug}` contra abuso/forca bruta.
 - [x] Implementar throttle nas tentativas de login no `AuthController`.
-- [] Definir respostas padrao para limite excedido (mensagem + HTTP 429).
+- [x] Definir respostas padrao para limite excedido (mensagem + HTTP 429).
 
 ---
 
