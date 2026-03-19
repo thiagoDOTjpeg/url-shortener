@@ -15,5 +15,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies('*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Illuminate\Http\Exceptions\ThrottleRequestsException $e, Request $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Calma lá! Você está indo rápido demais. Tente novamente em alguns minutos.',
+                    'retry_after' => $e->getHeaders()['Retry-After'] ?? null
+                ], 429);
+            }
+
+            return response()->view('errors.249', [
+                'message' => 'Muitas requisições. Respire fundo e aguarde.'
+            ], 429);
+        });
     })->create();
