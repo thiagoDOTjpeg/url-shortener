@@ -1,17 +1,12 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UrlController;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AnalyticsController;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Auth\Events\PasswordReset;
-use App\Models\User;
-
+use App\Http\Controllers\EmailController;
 
 Route::get('/', function () {
     return view('app');
@@ -23,19 +18,15 @@ Route::middleware('auth')->get('/dashboard', function () {
 
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
-})->middleware('auth')->name('verification.notice');
+})->middleware('auth')
+    ->name('verification.notice');
 
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
+Route::get('/email/verify/{id}/{hash}', [EmailController::class, 'verifyEmail'])
+    ->middleware(['auth', 'signed'])->name('verification.verify');
 
-    return redirect('/dashboard/home');
-})->middleware(['auth', 'signed'])->name('verification.verify');
-
-Route::post('/email/verification-notification', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
-
-    return back()->with('message', 'Verification link sent!');
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+Route::post('/email/verification-notification', [EmailController::class, 'sendEmailVerification'])
+    ->middleware(['auth', 'throttle:email-verification'])
+    ->name('verification.send');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', function () {
@@ -50,52 +41,26 @@ Route::middleware('guest')->group(function () {
         return view('auth.forgot-password');
     })->name('password.request');
 
-    Route::post('/forgot-password', function (Request $request) {
-        $request->validate(['email' => 'required|email']);
-
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
-
-        return $status === Password::ResetLinkSent
-            ? back()->with(['status' => __($status)])
-            : back()->withErrors(['email' => __($status)]);
-    })->name('password.email');
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])
+        ->name('password.email');
 
     Route::get('/reset-password/{token}', function (string $token) {
         return view('auth.reset-password', ['token' => $token]);
     })->name('password.reset');
 
-    Route::post('/reset-password', function (Request $request) {
-        $request->validate([
-            'token' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
-        ]);
+    Route::post('/reset-password', [AuthController::class, "resetPassword"])
+        ->name('password.update');
 
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function (User $user, string $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password)
-                ])->setRememberToken(Str::random(60));
+    Route::post('/register', [AuthController::class, 'register'])
+        ->middleware('throttle:create-user')
+        ->name('register');
 
-                $user->save();
-
-                event(new PasswordReset($user));
-            }
-        );
-
-        return $status === Password::PasswordReset
-            ? redirect()->route('login')->with('status', __($status))
-            : back()->withErrors(['email' => [__($status)]]);
-    })->name('password.update');
-
-    Route::post('/register', [AuthController::class, 'register'])->name('register');
-    Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])
+        ->middleware('throttle:login')
+        ->name('login');
 });
 
-Route::get('/r/{slug}', RedirectController::class)->name('url.redirect');
+Route::get('/r/{slug}', RedirectController::class)->middleware('throttle:redirects')->name('url.redirect');
 
 
 Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () {
@@ -103,14 +68,22 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () 
     Route::get('/home', [DashboardController::class, 'home'])->name('dashboard.home');
 
     Route::get('/analytics/{slug}', [AnalyticsController::class, 'show'])
+        ->middleware('throttle:analytics')
         ->name('dashboard.analytics');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/me', [AuthController::class, 'me'])->name('me');
-    Route::post('/urls/shorten', [UrlController::class, 'store'])->name('url.store');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::delete("/urls/{slug}", [UrlController::class, 'destroy'])->name('url.destroy');
+
+    Route::post('/urls/shorten', [UrlController::class, 'store'])
+        ->middleware('throttle:create-url')
+        ->name('url.store');
+
+    Route::post('/logout', [AuthController::class, 'logout'])
+        ->name('logout');
+
+    Route::delete("/urls/{slug}", [UrlController::class, 'destroy'])
+        ->name('url.destroy');
 });
 
