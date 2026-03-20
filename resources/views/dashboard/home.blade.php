@@ -125,28 +125,35 @@
                 @endif
             </div>
 
-            <div x-show="isDialogOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" x-cloak x-transition>
+            <div x-data="{
+                idempotencyKey: crypto.randomUUID(),
+                isProcessing: false
+            }
+            " x-show="isDialogOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" x-cloak x-transition>
                 <div class="bg-background border border-border rounded-lg p-6 max-w-md w-full shadow-lg" @click.outside="isDialogOpen = false">
                     <div class="mb-4">
                         <h3 class="text-lg font-medium">Criar novo link</h3>
                         <p class="text-sm text-muted-foreground">Cole a URL que deseja encurtar.</p>
                     </div>
                     <form @submit.prevent="
+                            isProcessing = true;
                             fetch('/urls/shorten', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                     'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
                                     'Accept': 'application/json',
+                                    'Idempotency-Key': idempotencyKey,
                                 },
                                 body: JSON.stringify({ original_url: document.getElementById('url').value })
                             })
                             .then(r => {
-                                if (!r.ok) return r.json().then(e => { console.error(e); throw e; });
-                                isDialogOpen = false;
+                                if (!r.ok) return r.json().then(e => { console.error(e); isProcessing= false; throw e;  });
+                                isProcessing = false
                                 window.location.reload();
                             })
                             .catch(e => console.error('Erro:', e))
+                            .finally(() => { isProcessing = false; document.getElementById('url').value = '' });
                         " class="space-y-4">
                         <div class="space-y-2">
                             <x-label for="url">URL original</x-label>
@@ -154,7 +161,7 @@
                         </div>
                         <div class="flex justify-end gap-3 mt-6">
                             <x-button variant="outline" type="button" @click="isDialogOpen = false">Cancelar</x-button>
-                            <x-button type="submit">Criar link</x-button>
+                            <x-button x-bind="CreateLinkButton">Criar link</x-button>
                         </div>
                     </form>
                 </div>
@@ -207,4 +214,15 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.bind('CreateLinkButton', () => ({
+                type: 'submit',
+                ':disabled'() {
+                    return this.isProcessing
+                }
+            }))
+        })
+    </script>
 </x-layouts.app>
