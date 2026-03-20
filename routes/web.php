@@ -7,13 +7,10 @@ use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\EmailController;
+use \Infinitypaul\Idempotency\Middleware\EnsureIdempotency;
 
 Route::get('/', function () {
     return view('app');
-});
-
-Route::middleware('auth')->get('/dashboard', function () {
-    return redirect()->route('dashboard.home');
 });
 
 Route::get('/email/verify', function () {
@@ -26,7 +23,7 @@ Route::get('/email/verify/{id}/{hash}', [EmailController::class, 'verifyEmail'])
 
 Route::post('/email/verification-notification', [EmailController::class, 'sendEmailVerification'])
     ->middleware(['auth', 'throttle:email-verification'])
-    ->name('verification.send');
+        ->name('verification.send');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', function () {
@@ -62,9 +59,13 @@ Route::middleware('guest')->group(function () {
 
 Route::get('/r/{slug}', RedirectController::class)->middleware('throttle:redirects')->name('url.redirect');
 
+Route::middleware(['auth'])->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/me', [AuthController::class, 'me'])->name('me');
+});
 
 Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () {
-
+    Route::get('/', [DashboardController::class, 'home']);
     Route::get('/home', [DashboardController::class, 'home'])->name('dashboard.home');
 
     Route::get('/analytics/{slug}', [AnalyticsController::class, 'show'])
@@ -73,15 +74,9 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->group(function () 
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-
-    Route::get('/me', [AuthController::class, 'me'])->name('me');
-
     Route::post('/urls/shorten', [UrlController::class, 'store'])
-        ->middleware('throttle:create-url')
+        ->middleware(['throttle:create-url', EnsureIdempotency::class])
         ->name('url.store');
-
-    Route::post('/logout', [AuthController::class, 'logout'])
-        ->name('logout');
 
     Route::delete("/urls/{slug}", [UrlController::class, 'destroy'])
         ->name('url.destroy');

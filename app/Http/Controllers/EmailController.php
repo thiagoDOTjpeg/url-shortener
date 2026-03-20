@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 
 class EmailController extends Controller {
     public function verifyEmail(EmailVerificationRequest $request) {
@@ -13,8 +14,8 @@ class EmailController extends Controller {
         return redirect('/dashboard/home');
     }
 
-    public function sendEmailVerification(EmailVerificationRequest $request) {
+    public function sendEmailVerification(Request $request) {
         $request->user()->sendEmailVerificationNotification();
-        return back()->with('message', 'Verification link sent!');
+        return back()->with('status', 'verification-link-sent');
     }
 }
