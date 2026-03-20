@@ -20,16 +20,16 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 - [ ] Criar testes de feature para fluxo de verificacao.
 
 ### 1.2 Gestao de Senhas (Reset Password)
-- [ ] Configurar fluxo completo de "Esqueci minha senha".
-- [ ] Configurar envio de e-mail para redefinicao.
-- [ ] Implementar tela/form de nova senha com token.
+- [x] Configurar fluxo completo de "Esqueci minha senha".
+- [x] Configurar envio de e-mail para redefinicao.
+- [x] Implementar tela/form de nova senha com token.
 - [ ] Criar testes de feature do fluxo completo.
 
 ### 1.3 Rate Limiting
-- [ ] Limitar criacao de URLs (exemplo: 5/min por usuario).
-- [ ] Proteger rota de redirecionamento `/r/{slug}` contra abuso/forca bruta.
-- [ ] Implementar throttle nas tentativas de login no `AuthController`.
-- [ ] Definir respostas padrao para limite excedido (mensagem + HTTP 429).
+- [x] Limitar criacao de URLs (exemplo: 5/min por usuario).
+- [x] Proteger rota de redirecionamento `/r/{slug}` contra abuso/forca bruta.
+- [x] Implementar throttle nas tentativas de login no `AuthController`.
+- [x] Definir respostas padrao para limite excedido (mensagem + HTTP 429).
 
 ---
 
@@ -37,7 +37,7 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 **Prioridade:** Alta
 
 ### 2.1 Processamento Assincrono
-- [ ] Mover captura de IP, `Location::get()` e criacao de `UrlClick` para Job em background.
+- [x] Mover captura de IP, `Location::get()` e criacao de `UrlClick` para Job em background.
 - [ ] Garantir idempotencia minima para evitar registros duplicados.
 - [ ] Criar testes de fila/feature para processamento assincrono.
 
