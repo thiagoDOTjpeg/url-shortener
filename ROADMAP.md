@@ -37,7 +37,7 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 **Prioridade:** Alta
 
 ### 2.1 Processamento Assincrono
-- [ ] Mover captura de IP, `Location::get()` e criacao de `UrlClick` para Job em background.
+- [x] Mover captura de IP, `Location::get()` e criacao de `UrlClick` para Job em background.
 - [ ] Garantir idempotencia minima para evitar registros duplicados.
 - [ ] Criar testes de fila/feature para processamento assincrono.
 
