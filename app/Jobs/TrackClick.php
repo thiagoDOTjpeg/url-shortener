@@ -19,7 +19,7 @@ class TrackClick implements ShouldQueue
         private readonly string $ip,
         private readonly string $userAgent,
         private readonly ?string $referer,
-        private readonly string $from,
+        private readonly string $from
         )
     {
     }
@@ -39,6 +39,8 @@ class TrackClick implements ShouldQueue
             'referer' => $this->referer,
             'from' => $this->from,
             'country' => $position?->countryCode,
+            'longitude' => $position?->longitude,
+            'latitude' => $position?->latitude,
         ]);
         $url->increment('click_count');
         $url->update();

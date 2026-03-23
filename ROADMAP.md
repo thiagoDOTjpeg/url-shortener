@@ -37,25 +37,25 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 **Prioridade:** Alta
 
 ### 2.1 Processamento Assincrono
-- [x] Mover captura de IP, `Location::get()` e criacao de `UrlClick` para Job em background.
-- [ ] Garantir idempotencia minima para evitar registros duplicados.
-- [ ] Criar testes de fila/feature para processamento assincrono.
+- [x] Mover captura de IP, `Location::get()` e criação de `UrlClick` para Job em background.
+- [x] Garantir idempotência minima para evitar registros duplicados.
+- [ ] Criar testes de fila/feature para processamento assíncrono.
 
-### 2.2 Geolocalizacao Avancada
-- [ ] Adicionar campos de latitude e longitude na tabela `url_clicks`.
-- [ ] Atualizar model e camada de persistencia.
+### 2.2 Geolocalização Avançada
+- [x] Adicionar campos de latitude e longitude na tabela `url_clicks`.
+- [ ] Atualizar model e camada de persistência.
 - [ ] Criar migration com rollback seguro.
 
 ### 2.3 User-Agent Parsing
 - [ ] Extrair e persistir dispositivo (Mobile/Desktop).
 - [ ] Extrair e persistir navegador.
 - [ ] Extrair e persistir sistema operacional.
-- [ ] Padronizar valores desconhecidos para analise consistente.
+- [ ] Padronizar valores desconhecidos para análise consistente.
 
-### 2.4 Filtros de Data Dinamicos no Dashboard
+### 2.4 Filtros de Data Dinâmicos no Dashboard
 - [ ] Implementar seletores: Hoje, 7 dias, 30 dias e Total.
-- [ ] Ajustar consultas e graficos para respeitar o periodo selecionado.
-- [ ] Persistir filtro selecionado na navegacao da pagina.
+- [ ] Ajustar consultas e gráficos para respeitar o periodo selecionado.
+- [ ] Persistir filtro selecionado na navegação da pagina.
 
 ### 2.5 Filtro de Bots
 - [ ] Identificar cliques de crawlers/robos conhecidos.
@@ -70,12 +70,12 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 ### 3.1 QR Code Feedback em Tempo Real
 - [ ] Notificar frontend via WebSocket quando `GenerateQrCode` finalizar.
 - [ ] Atualizar estado da tela sem refresh manual.
-- [ ] Tratar reconexao e estado de erro no frontend.
+- [ ] Tratar reconexão e estado de erro no frontend.
 
 ### 3.2 Live Dashboard
 - [ ] Atualizar contador de cliques em tempo real.
-- [ ] Atualizar graficos em tempo real ao registrar novo acesso.
-- [ ] Garantir que eventos enviados respeitam permissao/escopo do usuario.
+- [ ] Atualizar gráficos em tempo real ao registrar novo acesso.
+- [ ] Garantir que eventos enviados respeitam permissao/escopo do usuário.
 
 ---
 
