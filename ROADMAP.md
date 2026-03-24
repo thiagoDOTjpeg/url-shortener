@@ -43,14 +43,14 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 
 ### 2.2 Geolocalização Avançada
 - [x] Adicionar campos de latitude e longitude na tabela `url_clicks`.
-- [ ] Atualizar model e camada de persistência.
-- [ ] Criar migration com rollback seguro.
+- [x] Atualizar model e camada de persistência.
+- [x] Criar migration com rollback seguro.
 
 ### 2.3 User-Agent Parsing
-- [ ] Extrair e persistir dispositivo (Mobile/Desktop).
-- [ ] Extrair e persistir navegador.
-- [ ] Extrair e persistir sistema operacional.
-- [ ] Padronizar valores desconhecidos para análise consistente.
+- [x] Extrair e persistir dispositivo (Mobile/Desktop).
+- [x] Extrair e persistir navegador.
+- [x] Extrair e persistir sistema operacional.
+- [x] Padronizar valores desconhecidos para análise consistente.
 
 ### 2.4 Filtros de Data Dinâmicos no Dashboard
 - [ ] Implementar seletores: Hoje, 7 dias, 30 dias e Total.
