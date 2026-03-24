@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Url;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Jenssegers\Agent\Agent;
 use Stevebauman\Location\Facades\Location;
 
 class TrackClick implements ShouldQueue
@@ -19,7 +20,7 @@ class TrackClick implements ShouldQueue
         private readonly string $ip,
         private readonly string $userAgent,
         private readonly ?string $referer,
-        private readonly string $from,
+        private readonly string $from
         )
     {
     }
@@ -31,6 +32,12 @@ class TrackClick implements ShouldQueue
     {
         $url = Url::findOrFail($this->slug);
 
+        $agent = new Agent();
+        $agent->setUserAgent($this->userAgent);
+        $browser = $agent->browser();
+        $os = $agent->platform();
+        $device = $agent->deviceType() || 'Bot/unknown';
+
         $position = Location::get($this->ip);
 
         $url->clicks()->create([
@@ -39,7 +46,13 @@ class TrackClick implements ShouldQueue
             'referer' => $this->referer,
             'from' => $this->from,
             'country' => $position?->countryCode,
+            'longitude' => $position?->longitude,
+            'latitude' => $position?->latitude,
+            'browser' => $browser,
+            'os' => $os,
+            'device_type' => $device,
         ]);
+
         $url->increment('click_count');
         $url->update();
     }
