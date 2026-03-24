@@ -17,10 +17,23 @@ class UrlClick extends Model
         'from',
         'country',
         'clicked_at',
+        'longitude',
+        'latitude',
+        'browser',
+        'os',
+        'device_type',
     ];
 
     protected $casts = [
         'clicked_at' => 'datetime',
+        'referer' => 'string',
+        'from' => 'string',
+        'country' => 'string',
+        'longitude' => 'double',
+        'latitude' => 'double',
+        'browser' => 'string',
+        'os' => 'string',
+        'device_type' => 'string',
     ];
 
     public function url(): BelongsTo
