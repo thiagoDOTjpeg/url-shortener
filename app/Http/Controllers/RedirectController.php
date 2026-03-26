@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Jobs\TrackClick;
 use App\Models\Url;
 use Illuminate\Http\Request;
-use Stevebauman\Location\Facades\Location;
 
 class RedirectController extends Controller
 {
