@@ -7,9 +7,7 @@ use App\Jobs\GenerateQrCode;
 use App\Models\Url;
 use Base62\Base62;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Random\RandomException;
-use Stevebauman\Location\Facades\Location;
 
 class UrlController extends Controller
 {

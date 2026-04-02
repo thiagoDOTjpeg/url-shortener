@@ -1,7 +1,7 @@
 <?php
 
-/*  */
-namespace Tests\Feature;
+/** @noinspection PhpIllegalPsrClassPathInspection */
+namespace Tests\Feature\Controllers;
 
 use App\Jobs\TrackClick;
 use App\Models\Url;
@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
-class RedirectTest extends TestCase {
+class RedirectControllerTest extends TestCase {
 
     use RefreshDatabase;
 
@@ -89,19 +89,8 @@ class RedirectTest extends TestCase {
         $response->assertNotFound();
     }
 
-    public function test_should_it_thorws_an_exceptions_if_the_url_is_expired() {
-        Queue::fake();
-
-        $url = Url::factory()->create([
-            'id' => 'xpto123',
-            'original_url' =>  'https://www.github.com',
-            'user_id' => $this->user->id,
-            'click_count' => 0,
-        ]);
-
-        $response = $this->get('r/xpto123');
-
-        $response->assertNotFound();
+    public function test_should_it_throws_an_exceptions_if_the_url_is_expired() {
+        $this->markTestIncomplete('This test is not implemented yet. Because the expiration feature is not implemented yet.');
     }
 
 }
