@@ -7,6 +7,7 @@ use App\Jobs\TrackClick;
 use App\Models\Url;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
@@ -22,7 +23,7 @@ class RedirectControllerTest extends TestCase {
         $this->user = User::factory()->create([
             'name' => 'thiago',
             'email' => 'test_shoulde@gmail.com',
-            'password' => bcrypt('secret'),
+            'password' => Hash::make('secret'),
         ]);
     }
 

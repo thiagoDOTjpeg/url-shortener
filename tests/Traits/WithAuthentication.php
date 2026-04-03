@@ -5,6 +5,7 @@
 namespace Tests\Traits;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 trait WithAuthentication
 {
@@ -13,7 +14,7 @@ trait WithAuthentication
         $defaults = [
             'name' => 'Test User',
             'email' => 'test@example.com',
-            'password' => bcrypt('password'),
+            'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ];
 

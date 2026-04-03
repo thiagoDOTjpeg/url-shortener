@@ -6,6 +6,7 @@ namespace Tests\Feature\Controllers;
 use App\Models\Url;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class UrlControllerTest extends TestCase {
@@ -16,7 +17,7 @@ class UrlControllerTest extends TestCase {
         $user = $this->authenticate([
             'name' => 'thiago',
             'email' => 'test_shoulde@gmail.com',
-            'password' => bcrypt('secret'),
+            'password' => Hash::make('secret'),
         ]);
 
         $url = Url::factory()->create([
@@ -36,14 +37,14 @@ class UrlControllerTest extends TestCase {
     }
 
     public function test_should_not_destroy_url_from_another_user() {
-        $user1 = $this->authenticate([
+        $this->authenticate([
             'name' => 'thiago',
-            'password' => bcrypt('secret'),
+            'password' => Hash::make('secret'),
             'email' => 'user1@test.com'
         ]);
         $user2 = User::factory()->create([
             'name' => 'user2',
-            'password' => bcrypt('secret'),
+            'password' => Hash::make('secret'),
             'email' => 'user2@test.com'
         ]);
 
@@ -63,7 +64,7 @@ class UrlControllerTest extends TestCase {
         $user = User::factory()->create([
             'name' => 'thiago',
             'email' => 'teste@gmail.com',
-            'password' => bcrypt('secret'),
+            'password' => Hash::make('secret'),
         ]);
         $url = Url::factory()->create([
             'id' => 'xpto456',

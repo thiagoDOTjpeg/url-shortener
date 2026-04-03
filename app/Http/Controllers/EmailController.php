@@ -13,7 +13,6 @@ class EmailController extends Controller {
 
         return redirect('/dashboard/home');
     }
-
     public function sendEmailVerification(Request $request) {
         $request->user()->sendEmailVerificationNotification();
         return back()->with('status', 'verification-link-sent');
