@@ -9,7 +9,7 @@ use Base62\Base62;
 use Illuminate\Http\JsonResponse;
 use Random\RandomException;
 
-class UrlController extends Controller
+class UrlController
 {
 
     public function __construct(private readonly Base62 $base62)
@@ -29,7 +29,7 @@ class UrlController extends Controller
      */
     public function store(StoreUrlRequest $request): JsonResponse
     {
-        $slug = $this->base62->encode(random_int(1, PHP_INT_MAX));
+        $slug = $this->base62->encode(random_int(1, PHP_INT_MAX - 1));
         $url = new Url($request->validated());
         $url->id = $slug;
         $url->user_id = auth()->id();

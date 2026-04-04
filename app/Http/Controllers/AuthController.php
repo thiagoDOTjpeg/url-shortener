@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 
 
-class AuthController extends Controller
+class AuthController
 {
 
     public function forgotPassword(Request $request) {

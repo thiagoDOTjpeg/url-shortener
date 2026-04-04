@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Url;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -12,13 +11,6 @@ use Illuminate\Support\Str;
  */
 class UrlFactory extends Factory
 {
-    public function configure(): static
-    {
-        return $this->afterMaking(function (Url $url): void {
-            $url->id ??= (string) Str::ulid();
-        });
-    }
-
     /**
      * Define the model's default state.
      *
@@ -27,6 +19,7 @@ class UrlFactory extends Factory
     public function definition(): array
     {
         return [
+            'id' => (string) Str::ulid(),
             'user_id' => User::factory(),
             'original_url' => fake()->url(),
             'qr_code' => null,

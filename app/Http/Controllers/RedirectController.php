@@ -6,7 +6,7 @@ use App\Jobs\TrackClick;
 use App\Models\Url;
 use Illuminate\Http\Request;
 
-class RedirectController extends Controller
+class RedirectController
 {
     public function __invoke(string $slug, Request $request) {
         $url = Url::findOrFail($slug);

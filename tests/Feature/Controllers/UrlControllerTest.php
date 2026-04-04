@@ -3,10 +3,13 @@
 /** @noinspection PhpIllegalPsrClassPathInspection */
 namespace Tests\Feature\Controllers;
 
+use App\Jobs\GenerateQrCode;
 use App\Models\Url;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class UrlControllerTest extends TestCase {
@@ -77,6 +80,35 @@ class UrlControllerTest extends TestCase {
         $response = $this->delete("/urls/{$url->id}");
 
         $response->assertStatus(302);
+    }
+
+    public function test_should_store_url_link_successfully() {
+        Queue::fake();
+
+        $user = $this->authenticate([
+            'name' => 'thiago',
+            'password' => Hash::make('secret'),
+            'email' => 'teste@gmail.com',
+        ]);
+
+        $idempotencyKey = (string) Str::uuid();
+
+        $response = $this->withHeaders([
+            'Idempotency-Key' => $idempotencyKey,
+        ])->post('/urls/shorten', [
+            'original_url' => 'https://www.github.com',
+        ]);
+
+
+        $response->assertStatus(201);
+        Queue::assertPushed(GenerateQrCode::class);
+
+        $this->assertDatabaseHas('urls', [
+            'id' => $response->json('id'),
+            'user_id' => $user->id,
+            'original_url' => 'https://www.github.com',
+        ]);
+
     }
 
 }
