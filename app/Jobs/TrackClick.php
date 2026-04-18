@@ -36,7 +36,7 @@ class TrackClick implements ShouldQueue
         $agent->setUserAgent($this->userAgent);
         $browser = $agent->browser();
         $os = $agent->platform();
-        $device = $agent->deviceType() || 'Bot/unknown';
+        $device = $agent->deviceType() ?: 'Bot/unknown';
 
         $position = Location::get($this->ip) ?: null;
 

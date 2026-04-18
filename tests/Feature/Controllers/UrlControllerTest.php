@@ -109,6 +109,8 @@ class UrlControllerTest extends TestCase {
             'original_url' => 'https://www.github.com',
         ]);
 
+        $url = Url::find($response->json('id'));
+        $this->assertEquals($user->id, $url->user->id);
     }
 
 }

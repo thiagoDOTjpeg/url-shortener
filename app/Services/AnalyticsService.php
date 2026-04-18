@@ -40,9 +40,7 @@ class AnalyticsService {
             ->limit(5)
             ->get()
             ->map(function ($item) use ($totalClicks) {
-                $item->percentage = $totalClicks > 0
-                    ? round(($item->clicks / $totalClicks) * 100, 1)
-                    : 0;
+                $item->percentage = round(($item->clicks / $totalClicks) * 100, 1);
                 return $item;
             });
 
