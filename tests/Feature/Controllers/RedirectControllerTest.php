@@ -91,7 +91,19 @@ class RedirectControllerTest extends TestCase {
     }
 
     public function test_should_it_throws_an_exceptions_if_the_url_is_expired() {
-        $this->markTestIncomplete('This test is not implemented yet. Because the expiration feature is not implemented yet.');
+        Queue::fake();
+        Url::factory()->create([
+            'id' => 'xpto123',
+            'original_url' =>  'https://www.github.com',
+            'user_id' => $this->user->id,
+            'click_count' => 0,
+            'expires_at' => now()->subDays(30),
+        ]);
+
+        $response = $this->get('r/xpto123');
+
+        Queue::assertNotPushed(TrackClick::class);
+        $response->assertViewIs('r.expired-link');
     }
 
 }

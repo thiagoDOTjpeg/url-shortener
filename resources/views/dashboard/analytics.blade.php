@@ -1,6 +1,15 @@
 @php use Carbon\Carbon; @endphp
 @php
-    $baseUrl = config('app.url')
+    $baseUrl = config('app.url');
+    $expiresAt = $link->expires_at;
+    $hasExpiration = !is_null($expiresAt);
+    $isExpired = $hasExpiration && $expiresAt->isPast();
+    $expirationStatusLabel = !$hasExpiration ? 'Sem expiração' : ($isExpired ? 'Expirado' : 'Ativo');
+    $expirationStatusClasses = !$hasExpiration
+        ? 'bg-secondary text-muted-foreground border-border/60'
+        : ($isExpired
+            ? 'bg-destructive/10 text-destructive border-destructive/30'
+            : 'bg-emerald-500/10 text-emerald-700 border-emerald-500/30');
 @endphp
 
 <x-layouts.app>
@@ -25,6 +34,9 @@
             <div>
                 <div class="flex items-center gap-3 mb-2">
                     <h1 class="text-2xl font-medium">{{ $baseUrl }}/r/{{ $link->id }}</h1>
+                    <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium {{ $expirationStatusClasses }}">
+                        {{ $expirationStatusLabel }}
+                    </span>
                     <button
                         @click="copy()"
                         class="text-muted-foreground hover:text-foreground transition-colors"
@@ -45,7 +57,7 @@
             </x-button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <div class="bg-secondary/50 rounded-lg p-4 border border-border/50">
                 <div class="flex items-center gap-2 mb-2">
                     <x-lucide-mouse-pointer class="h-4 w-4 text-muted-foreground"/>
@@ -66,6 +78,18 @@
                     <p class="text-sm text-muted-foreground">Países</p>
                 </div>
                 <p class="text-3xl font-medium">{{ $topCountries->count() }}</p>
+            </div>
+            <div class="bg-secondary/50 rounded-lg p-4 border border-border/50">
+                <div class="flex items-center gap-2 mb-2">
+                    <x-lucide-clock class="h-4 w-4 text-muted-foreground"/>
+                    <p class="text-sm text-muted-foreground">Expira em</p>
+                </div>
+                <p class="text-2xl font-medium leading-tight">
+                    {{ $hasExpiration ? Carbon::parse($expiresAt)->format('d/m/Y H:i') : 'Sem expiração' }}
+                </p>
+                @if($hasExpiration)
+                    <p class="text-xs text-muted-foreground mt-1">{{ $isExpired ? 'Expirou' : 'Expira' }} {{ Carbon::parse($expiresAt)->diffForHumans() }}</p>
+                @endif
             </div>
         </div>
 

@@ -17,13 +17,13 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 - [x] Implementar `implements MustVerifyEmail` no model `User`.
 - [x] Proteger areas autenticadas para usuarios com e-mail verificado.
 - [x] Adicionar aviso na UI para reenvio de confirmacao.
-- [ ] Criar testes de feature para fluxo de verificacao.
+- [x] Criar testes de feature para fluxo de verificacao.
 
 ### 1.2 Gestao de Senhas (Reset Password)
 - [x] Configurar fluxo completo de "Esqueci minha senha".
 - [x] Configurar envio de e-mail para redefinicao.
 - [x] Implementar tela/form de nova senha com token.
-- [ ] Criar testes de feature do fluxo completo.
+- [x] Criar testes de feature do fluxo completo.
 
 ### 1.3 Rate Limiting
 - [x] Limitar criacao de URLs (exemplo: 5/min por usuario).
@@ -39,7 +39,7 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 ### 2.1 Processamento Assincrono
 - [x] Mover captura de IP, `Location::get()` e criação de `UrlClick` para Job em background.
 - [x] Garantir idempotência minima para evitar registros duplicados.
-- [ ] Criar testes de fila/feature para processamento assíncrono.
+- [x] Criar testes de fila/feature para processamento assíncrono.
 
 ### 2.2 Geolocalização Avançada
 - [x] Adicionar campos de latitude e longitude na tabela `url_clicks`.
@@ -54,12 +54,12 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 
 ### 2.4 Filtros de Data Dinâmicos no Dashboard
 - [ ] Implementar seletores: Hoje, 7 dias, 30 dias e Total.
-- [ ] Ajustar consultas e gráficos para respeitar o periodo selecionado.
-- [ ] Persistir filtro selecionado na navegação da pagina.
+- [ ] Ajustar consultas e gráficos para respeitar o período selecionado.
+- [ ] Persistir filtro selecionado na navegação da página.
 
 ### 2.5 Filtro de Bots
 - [ ] Identificar cliques de crawlers/robos conhecidos.
-- [ ] Marcar `is_bot` (ou ignorar no registro, conforme decisao de produto).
+- [ ] Marcar `is_bot` (ou ignorar no registro, conforme decisão de produto).
 - [ ] Permitir alternar no dashboard entre "incluir bots" e "excluir bots".
 
 ---
@@ -82,25 +82,25 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 ## Fase 4 - Arquitetura e Documentacao
 **Prioridade:** Media
 
-### 5.1 Refatoracao para Actions
-- [ ] Criar classes de acao (ex.: `CreateShortenUrlAction`).
+### 5.1 Refatoração para Actions
+- [ ] Criar classes de ação (ex.: `CreateShortenUrlAction`).
 - [ ] Reduzir responsabilidade dos controllers (`UrlController` mais enxuto).
 - [ ] Cobrir actions com testes unitarios e de integracao.
 
-### 5.2 API + Documentacao
-- [ ] Padronizar autenticacao API com Sanctum.
-- [ ] Integrar Scramble para documentacao automatica.
+### 5.2 API + Documentação
+- [ ] Padronizar autenticação API com Sanctum.
+- [ ] Integrar Scramble para documentacão automática.
 - [ ] Publicar endpoint de docs e revisar exemplos de uso.
 
 ### 5.3 Novo README
-- [ ] Substituir boilerplate por documentacao real do projeto.
+- [ ] Substituir boilerplate por documentação real do projeto.
 - [ ] Documentar stack, setup Docker, workflow de desenvolvimento e funcionalidades do Shortly.
 - [ ] Incluir secoes de deploy, variaveis de ambiente e troubleshooting.
 
 ---
 
 ## Milestones sugeridas
-- [ ] **M1 (Seguranca):** concluir Fase 1
+- [x] **M1 (Seguranca):** concluir Fase 1
 - [ ] **M2 (Dados):** concluir Fase 2
 - [ ] **M3 (Realtime):** concluir Fase 3
 - [ ] **M4 (Infra):** concluir Fase 4

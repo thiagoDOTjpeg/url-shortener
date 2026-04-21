@@ -29,6 +29,10 @@ class Url extends Model
         'expires_at' => 'datetime',
     ];
 
+    public function is_expired(): bool {
+        return $this->expires_at < now();
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
