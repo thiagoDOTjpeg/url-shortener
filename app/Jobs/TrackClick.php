@@ -16,11 +16,11 @@ class TrackClick implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        private readonly string $slug,
-        private readonly string $ip,
-        private readonly string $userAgent,
-        private readonly ?string $referer,
-        private readonly string $from
+        public readonly string $slug,
+        public readonly string $ip,
+        public readonly string $userAgent,
+        public readonly ?string $referer,
+        public readonly string $from
         )
     {
     }
@@ -36,9 +36,9 @@ class TrackClick implements ShouldQueue
         $agent->setUserAgent($this->userAgent);
         $browser = $agent->browser();
         $os = $agent->platform();
-        $device = $agent->deviceType() || 'Bot/unknown';
+        $device = $agent->deviceType() ?: 'Bot/unknown';
 
-        $position = Location::get($this->ip);
+        $position = Location::get($this->ip) ?: null;
 
         $url->clicks()->create([
             'ip_address' => $this->ip,

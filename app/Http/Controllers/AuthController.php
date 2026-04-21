@@ -8,10 +8,11 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 
 
-class AuthController extends Controller
+class AuthController
 {
 
     public function forgotPassword(Request $request) {
@@ -21,9 +22,12 @@ class AuthController extends Controller
             $request->only('email')
         );
 
-        return $status === Password::ResetLinkSent
-            ? back()->with(['status' => __($status)])
-            : back()->withErrors(['email' => __($status)]);
+        if($status === Password::RESET_LINK_SENT) {
+            return back()->with(['status' => __($status)]);
+        } else {
+            Log::warning('Someone tried to reset password with a email that doesn\'t exist: ');
+            return back()->with(['status' => __('passwords.sent')]);
+        }
     }
 
     public function resetPassword(Request $request) {
