@@ -11,10 +11,10 @@ class NativeBase62 extends VendorBase62
     {
         parent::__construct();
     }
-
+    #[\Override]
     public function encode($number): string
     {
-        if (! $this->isValidNumber($number)) {
+        if (!$this->isValidNumber($number)) {
             throw new InvalidArgumentException('Invalid number for BasicEncoder');
         }
 
@@ -22,18 +22,29 @@ class NativeBase62 extends VendorBase62
             return '0';
         }
 
-        $number = (int) $number;
-        $encoded = '';
+        $currentNumber = (string) $number;
+        $result = '';
 
-        while ($number > 0) {
-            $encoded = self::CHARS[$number % self::BASE_LENGTH] . $encoded;
-            $number = intdiv($number, self::BASE_LENGTH);
+        while($currentNumber != "0") {
+            $writtenQuocient = '';
+            $accumulatedRest = 0;
+
+            foreach(str_split($currentNumber) as $digit) {
+               $calculatedDigits = (int)$digit + ($accumulatedRest * 10);
+               $writtenQuocient .= intdiv($calculatedDigits, self::BASE_LENGTH);
+               $accumulatedRest = $calculatedDigits % self::BASE_LENGTH;
+            }
+
+            $result = self::CHARS[$accumulatedRest] . $result;
+
+            $currentNumber = ltrim($writtenQuocient, '0') ?: '0';
+
         }
-
-        return $encoded;
+        return $result;
     }
 
-    public function decode($base62)
+        #[\Override]
+        public function decode($base62)
     {
         if (! is_string($base62) || ! preg_match('/^[a-zA-Z0-9]+$/', $base62)) {
             throw new InvalidArgumentException('Must be a base 62 valid string');
