@@ -11,14 +11,30 @@ class AnalyticsController
     }
 
     public function show(Request $request, string $slug) {
+
         $link = auth()->user()->urls()->where('id', $slug)->firstOrFail();
 
-        $days = (int) $request->query('days', 7);
+        $periodOptions = [
+            'today' => 1,
+            '7d' => 7,
+            '30d' => 30,
+            'total' => null,
+        ];
+
+        $selectedPeriod = (string) $request->query('period', '7d');
+
+        if (!array_key_exists($selectedPeriod, $periodOptions)) {
+            $selectedPeriod = '7d';
+        }
+
+        $days = $periodOptions[$selectedPeriod];
 
         $analytics = $this->analyticsService->getAnalytics($link, $days);
+
         return view('dashboard.analytics', array_merge([
             'link' => $link,
-            'days' => $days
+            'days' => $days,
+            'selectedPeriod' => $selectedPeriod,
         ], $analytics));
     }
 }

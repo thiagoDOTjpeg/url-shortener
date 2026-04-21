@@ -18,7 +18,7 @@ class AnalyticsServiceTest extends TestCase {
 
     public function setUp(): void {
         parent::setUp();
-        Carbon::setTestNow(2026, 01, 01, 01, 0, 0);
+        Carbon::setTestNow(Carbon::create(2026, 1, 1, 1, 0, 0));
         $this->user = User::factory()->create([
             'name' => 'Test User',
             'email' => 'email@gmail.com',
@@ -63,5 +63,45 @@ class AnalyticsServiceTest extends TestCase {
         $this->assertEmpty($result['totalClicks']);
         $this->assertEmpty($result['heatmap']);
         $this->assertEmpty(0, $result['topCountries']);
+    }
+
+    public function test_should_filter_clicks_for_today_correctly(): void
+    {
+        $url = Url::factory()->create([
+            'id' => 'today123',
+            'user_id' => $this->user->id,
+            'original_url' => 'https://www.google.com/',
+        ]);
+
+        $url->clicks()->createMany([
+            ['clicked_at' => Carbon::now()->subMinutes(30), 'country' => 'US'],
+            ['clicked_at' => Carbon::now()->subMinutes(50), 'country' => 'BR'],
+            ['clicked_at' => Carbon::now()->subDay(), 'country' => 'AR'],
+        ]);
+
+        $analyticsService = new AnalyticsService();
+        $result = $analyticsService->getAnalytics($url, 1);
+
+        $this->assertEquals(2, $result['totalClicks']);
+    }
+
+    public function test_should_return_total_period_when_days_is_null(): void
+    {
+        $url = Url::factory()->create([
+            'id' => 'total123',
+            'user_id' => $this->user->id,
+            'original_url' => 'https://www.google.com/',
+        ]);
+
+        $url->clicks()->createMany([
+            ['clicked_at' => Carbon::now()->subDays(40), 'country' => 'US'],
+            ['clicked_at' => Carbon::now()->subDays(10), 'country' => 'BR'],
+            ['clicked_at' => Carbon::now()->subDay(), 'country' => 'AR'],
+        ]);
+
+        $analyticsService = new AnalyticsService();
+        $result = $analyticsService->getAnalytics($url, null);
+
+        $this->assertEquals(3, $result['totalClicks']);
     }
 }
