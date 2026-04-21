@@ -53,9 +53,9 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 - [x] Padronizar valores desconhecidos para análise consistente.
 
 ### 2.4 Filtros de Data Dinâmicos no Dashboard
-- [ ] Implementar seletores: Hoje, 7 dias, 30 dias e Total.
-- [ ] Ajustar consultas e gráficos para respeitar o período selecionado.
-- [ ] Persistir filtro selecionado na navegação da página.
+- [x] Implementar seletores: Hoje, 7 dias, 30 dias e Total.
+- [x] Ajustar consultas e gráficos para respeitar o período selecionado.
+- [x] Persistir filtro selecionado na navegação da página.
 
 ### 2.5 Filtro de Bots
 - [ ] Identificar cliques de crawlers/robos conhecidos.
