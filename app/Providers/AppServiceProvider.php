@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Base62\Base62;
+use App\Support\Base62\NativeBase62;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(Base62::class, function () {
-            return new Base62();
+            return new NativeBase62();
         });
     }
 

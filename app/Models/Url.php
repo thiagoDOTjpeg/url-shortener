@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Eloquent;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,6 +16,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Url extends Model
 {
+
+    use HasFactory;
+
     protected $primaryKey = 'id';
     public $incrementing = false;
     protected $keyType = 'string';
@@ -24,6 +28,10 @@ class Url extends Model
     protected $casts = [
         'expires_at' => 'datetime',
     ];
+
+    public function is_expired(): bool {
+        return $this->expires_at < now();
+    }
 
     public function user(): BelongsTo
     {

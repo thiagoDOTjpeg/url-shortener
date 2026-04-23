@@ -6,13 +6,23 @@ use App\Models\Url;
 
 class AnalyticsService {
 
-    public function getAnalytics(Url $link, $days): array
+    public function getAnalytics(Url $link, ?int $days = 7, bool $includeBots = false): array
     {
-        $startDate = now()->subDays($days);
+        $clicksQuery = $link->clicks();
 
-        $allClicks = $link->clicks()
-            ->where('clicked_at', '>=', $startDate)
-            ->get();
+        if (!is_null($days)) {
+            $startDate = $days === 1
+                ? now()->startOfDay()
+                : now()->subDays($days - 1)->startOfDay();
+
+            $clicksQuery->where('clicked_at', '>=', $startDate);
+        }
+
+        if (!$includeBots) {
+            $clicksQuery->where('is_bot', false);
+        }
+
+        $allClicks = (clone $clicksQuery)->get();
 
         $totalClicks = $allClicks->count();
 
@@ -32,24 +42,20 @@ class AnalyticsService {
                 ];
             })->sortByDesc('clicks');
 
-        $topCountries = $link->clicks()
-            ->where('clicked_at', '>=', $startDate)
+        $topCountries = (clone $clicksQuery)
             ->selectRaw("country, COUNT(*) as clicks")
             ->groupBy('country')
             ->orderByDesc('clicks')
             ->limit(5)
             ->get()
             ->map(function ($item) use ($totalClicks) {
-                $item->percentage = $totalClicks > 0
-                    ? round(($item->clicks / $totalClicks) * 100, 1)
-                    : 0;
+                $item->percentage = round(($item->clicks / $totalClicks) * 100, 1);
                 return $item;
             });
 
-        $recentClicks = $link->clicks()
-            ->where('clicked_at', '>=', $startDate)
+        $recentClicks = (clone $clicksQuery)
             ->latest('clicked_at')
-            ->take(10)
+            ->take(5)
             ->get();
 
         $maxClicks = $countryStats->max('clicks') ?: 1;
