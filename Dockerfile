@@ -1,21 +1,5 @@
 # syntax=docker/dockerfile:1.7
 
-FROM composer:2 AS deps
-
-WORKDIR /app
-
-COPY composer.json composer.lock ./
-
-RUN --mount=type=cache,target=/tmp/composer-cache \
-    composer install \
-    --no-dev \
-    --no-interaction \
-    --no-progress \
-    --no-scripts \
-    --optimize-autoloader \
-    --prefer-dist \
-    --cache-dir=/tmp/composer-cache
-
 FROM node:22-alpine AS assets
 
 WORKDIR /app
@@ -81,9 +65,21 @@ COPY docker/supervisord.conf /etc/supervisord.conf
 
 WORKDIR /var/www/html
 
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+COPY composer.json composer.lock ./
+
+RUN --mount=type=cache,target=/tmp/composer-cache \
+    COMPOSER_CACHE_DIR=/tmp/composer-cache composer install \
+    --no-dev \
+    --no-interaction \
+    --no-progress \
+    --no-scripts \
+    --optimize-autoloader \
+    --prefer-dist
+
 COPY . .
 
-COPY --from=deps /app/vendor ./vendor
 
 COPY --from=assets /app/public/build ./public/build
 
