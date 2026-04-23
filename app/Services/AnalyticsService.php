@@ -6,7 +6,7 @@ use App\Models\Url;
 
 class AnalyticsService {
 
-    public function getAnalytics(Url $link, ?int $days = 7): array
+    public function getAnalytics(Url $link, ?int $days = 7, bool $includeBots = false): array
     {
         $clicksQuery = $link->clicks();
 
@@ -16,6 +16,10 @@ class AnalyticsService {
                 : now()->subDays($days - 1)->startOfDay();
 
             $clicksQuery->where('clicked_at', '>=', $startDate);
+        }
+
+        if (!$includeBots) {
+            $clicksQuery->where('is_bot', false);
         }
 
         $allClicks = (clone $clicksQuery)->get();

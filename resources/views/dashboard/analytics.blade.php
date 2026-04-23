@@ -9,10 +9,17 @@
     ];
     $selectedPeriod = $selectedPeriod ?? '7d';
     $selectedPeriodLabel = $periodLabels[$selectedPeriod] ?? $periodLabels['7d'];
+    $includeBots = $includeBots ?? false;
+    $botFilterQuery = ['include_bots' => $includeBots ? 1 : 0];
     $showGlobalEmptyState = $totalClicks === 0;
     $expiresAt = $link->expires_at;
     $hasExpiration = !is_null($expiresAt);
     $isExpired = $hasExpiration && $expiresAt->isPast();
+    $expirationHumanized = $hasExpiration ? $expiresAt->locale('pt_BR')->diffForHumans() : null;
+    $remainingExpirationLabel = !$hasExpiration
+        ? 'Sem expiração'
+        : ($isExpired ? 'Expirado ' . $expirationHumanized : $expirationHumanized);
+    $expirationDateLabel = $hasExpiration ? $expiresAt->format('d/m/Y H:i') : 'Sem expiração';
     $expirationStatusLabel = !$hasExpiration ? 'Sem expiração' : ($isExpired ? 'Expirado' : 'Ativo');
     $expirationStatusClasses = !$hasExpiration
         ? 'bg-secondary text-muted-foreground border-border/60'
@@ -39,23 +46,37 @@
             Voltar para dashboard
         </a>
 
-        <div class="inline-flex items-center gap-2 bg-secondary/60 border border-border rounded-lg p-1 mb-6 w-fit">
-            <a href="{{ route('dashboard.analytics', ['slug' => $link->id, 'period' => 'today']) }}"
+        <div class="flex gap-3 mb-6">
+            <div class="inline-flex items-center gap-2 bg-secondary/60 border border-border rounded-lg p-1 w-fit">
+            <a href="{{ route('dashboard.analytics', array_merge(['slug' => $link->id, 'period' => 'today'], $botFilterQuery)) }}"
                class="px-3 py-1.5 text-sm rounded-md transition-colors {{ $selectedPeriod === 'today' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground' }}">
                 Hoje
             </a>
-            <a href="{{ route('dashboard.analytics', ['slug' => $link->id, 'period' => '7d']) }}"
+            <a href="{{ route('dashboard.analytics', array_merge(['slug' => $link->id, 'period' => '7d'], $botFilterQuery)) }}"
                class="px-3 py-1.5 text-sm rounded-md transition-colors {{ $selectedPeriod === '7d' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground' }}">
                 7 dias
             </a>
-            <a href="{{ route('dashboard.analytics', ['slug' => $link->id, 'period' => '30d']) }}"
+            <a href="{{ route('dashboard.analytics', array_merge(['slug' => $link->id, 'period' => '30d'], $botFilterQuery)) }}"
                class="px-3 py-1.5 text-sm rounded-md transition-colors {{ $selectedPeriod === '30d' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground' }}">
                 30 dias
             </a>
-            <a href="{{ route('dashboard.analytics', ['slug' => $link->id, 'period' => 'total']) }}"
+            <a href="{{ route('dashboard.analytics', array_merge(['slug' => $link->id, 'period' => 'total'], $botFilterQuery)) }}"
                class="px-3 py-1.5 text-sm rounded-md transition-colors {{ $selectedPeriod === 'total' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground' }}">
                 Total
             </a>
+            </div>
+
+            <div class="inline-flex items-center gap-2 bg-secondary/60 border border-border rounded-lg p-1 w-fit">
+                <span class="px-2 text-xs text-muted-foreground">Bots</span>
+                <a href="{{ route('dashboard.analytics', ['slug' => $link->id, 'period' => $selectedPeriod, 'include_bots' => 0]) }}"
+                   class="px-3 py-1.5 text-sm rounded-md transition-colors {{ !$includeBots ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground' }}">
+                    Excluir
+                </a>
+                <a href="{{ route('dashboard.analytics', ['slug' => $link->id, 'period' => $selectedPeriod, 'include_bots' => 1]) }}"
+                   class="px-3 py-1.5 text-sm rounded-md transition-colors {{ $includeBots ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground' }}">
+                    Incluir
+                </a>
+            </div>
         </div>
 
         <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8">
@@ -78,6 +99,9 @@
                     </button>
                 </div>
                 <p class="text-sm text-muted-foreground truncate max-w-md">{{ $link->original_url }}</p>
+                <p class="text-xs text-muted-foreground mt-1">
+                    Tempo restante: {{ $remainingExpirationLabel }}
+                </p>
             </div>
             <x-button variant="outline" href="{{ $link->original_url }}" target="_blank">
                 <x-lucide-external-link class="h-4 w-4 mr-2"/>
@@ -133,13 +157,13 @@
                 <div class="bg-secondary/50 rounded-lg p-4 border border-border/50">
                     <div class="flex items-center gap-2 mb-2">
                         <x-lucide-clock class="h-4 w-4 text-muted-foreground"/>
-                        <p class="text-sm text-muted-foreground">Expira em</p>
+                        <p class="text-sm text-muted-foreground">Tempo restante</p>
                     </div>
                     <p class="text-2xl font-medium leading-tight">
-                        {{ $hasExpiration ? Carbon::parse($expiresAt)->format('d/m/Y H:i') : 'Sem expiração' }}
+                        {{ $remainingExpirationLabel }}
                     </p>
                     @if($hasExpiration)
-                        <p class="text-xs text-muted-foreground mt-1">{{ $isExpired ? 'Expirou' : 'Expira' }} {{ Carbon::parse($expiresAt)->diffForHumans() }}</p>
+                        <p class="text-xs text-muted-foreground mt-1">Data: {{ $expirationDateLabel }}</p>
                     @endif
                 </div>
             </div>
