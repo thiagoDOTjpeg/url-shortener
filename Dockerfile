@@ -1,58 +1,20 @@
-FROM php:8.4-cli-alpine AS deps
+# syntax=docker/dockerfile:1.7
 
-RUN apk add --no-cache \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    libwebp-dev \
-    freetype-dev \
-    libzip-dev \
-    icu-dev \
-    oniguruma-dev \
-    libpq-dev \
-    unzip \
-    git
-
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install -j$(nproc) \
-        pdo \
-        pdo_pgsql \
-        pgsql \
-        gd \
-        zip \
-        bcmath \
-        intl \
-        mbstring \
-        opcache \
-        pcntl
-
-RUN apk add --no-cache $PHPIZE_DEPS \
-    && pecl install redis \
-    && docker-php-ext-enable redis \
-    && apk del $PHPIZE_DEPS
-
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+FROM composer:2 AS deps
 
 WORKDIR /app
 
 COPY composer.json composer.lock ./
 
-RUN apk add --no-cache \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    postgresql-dev \
-    libxml2-dev \
-    curl-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd pdo_pgsql curl dom xml
-
-RUN composer install \
+RUN --mount=type=cache,target=/tmp/composer-cache \
+    composer install \
     --no-dev \
     --no-interaction \
     --no-progress \
     --no-scripts \
     --optimize-autoloader \
-    --prefer-dist
+    --prefer-dist \
+    --cache-dir=/tmp/composer-cache
 
 FROM node:22-alpine AS assets
 
@@ -60,7 +22,8 @@ WORKDIR /app
 
 COPY package.json package-lock.json* ./
 
-RUN npm ci --prefer-offline
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --prefer-offline --no-audit
 
 COPY vite.config.js ./
 COPY resources/ resources/
