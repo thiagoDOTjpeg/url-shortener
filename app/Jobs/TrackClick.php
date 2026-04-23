@@ -37,6 +37,7 @@ class TrackClick implements ShouldQueue
         $browser = $agent->browser();
         $os = $agent->platform();
         $device = $agent->deviceType() ?: 'Bot/unknown';
+        $is_bot = $agent->isBot();
 
         $position = Location::get($this->ip) ?: null;
 
@@ -48,6 +49,7 @@ class TrackClick implements ShouldQueue
             'country' => $position?->countryCode,
             'longitude' => $position?->longitude,
             'latitude' => $position?->latitude,
+            'is_bot' => $is_bot,
             'browser' => $browser,
             'os' => $os,
             'device_type' => $device,

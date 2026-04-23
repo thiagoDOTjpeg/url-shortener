@@ -29,12 +29,18 @@ class AnalyticsController
 
         $days = $periodOptions[$selectedPeriod];
 
-        $analytics = $this->analyticsService->getAnalytics($link, $days);
+        $includeBots = $request->boolean(
+            'include_bots',
+            $request->boolean('bot_enabled', false)
+        );
+
+        $analytics = $this->analyticsService->getAnalytics($link, $days, $includeBots);
 
         return view('dashboard.analytics', array_merge([
             'link' => $link,
             'days' => $days,
             'selectedPeriod' => $selectedPeriod,
+            'includeBots' => $includeBots,
         ], $analytics));
     }
 }

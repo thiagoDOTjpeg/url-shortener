@@ -36,7 +36,7 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 ## Fase 2 - Analytics Detalhado (Inteligencia de Dados)
 **Prioridade:** Alta
 
-### 2.1 Processamento Assincrono
+### 2.1 Processamento Assíncrono
 - [x] Mover captura de IP, `Location::get()` e criação de `UrlClick` para Job em background.
 - [x] Garantir idempotência minima para evitar registros duplicados.
 - [x] Criar testes de fila/feature para processamento assíncrono.
@@ -58,7 +58,7 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 - [x] Persistir filtro selecionado na navegação da página.
 
 ### 2.5 Filtro de Bots
-- [ ] Identificar cliques de crawlers/robos conhecidos.
+- [x] Identificar cliques de crawlers/robos conhecidos.
 - [ ] Marcar `is_bot` (ou ignorar no registro, conforme decisão de produto).
 - [ ] Permitir alternar no dashboard entre "incluir bots" e "excluir bots".
 

@@ -20,6 +20,7 @@ class UrlClick extends Model
         'longitude',
         'latitude',
         'browser',
+        'is_bot',
         'os',
         'device_type',
     ];
@@ -32,6 +33,7 @@ class UrlClick extends Model
         'longitude' => 'double',
         'latitude' => 'double',
         'browser' => 'string',
+        'is_bot' => 'boolean',
         'os' => 'string',
         'device_type' => 'string',
     ];

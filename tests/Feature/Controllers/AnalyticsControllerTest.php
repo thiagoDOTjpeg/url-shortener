@@ -33,6 +33,7 @@ class AnalyticsControllerTest extends TestCase {
             $response->assertStatus(200);
             $response->assertViewIs('dashboard.analytics');
             $response->assertViewHas('selectedPeriod', '7d');
+            $response->assertViewHas('includeBots', false);
     }
 
     public function test_should_accept_period_filter_on_analytics_dashboard(): void
@@ -52,6 +53,38 @@ class AnalyticsControllerTest extends TestCase {
         $response->assertViewHas('selectedPeriod', '30d');
     }
 
+    public function test_should_accept_include_bots_filter_on_analytics_dashboard(): void
+    {
+        $user = $this->authenticate();
+
+        $link = Url::factory()->create([
+            'id' => 'xpto123',
+            'user_id' => $user->id,
+            'original_url' => 'https://www.example.com',
+        ]);
+
+        $response = $this->get("/dashboard/analytics/{$link->id}?period=7d&include_bots=1");
+
+        $response->assertStatus(200);
+        $response->assertViewHas('includeBots', true);
+    }
+
+    public function test_should_accept_legacy_bot_enabled_filter_on_analytics_dashboard(): void
+    {
+        $user = $this->authenticate();
+
+        $link = Url::factory()->create([
+            'id' => 'xpto123',
+            'user_id' => $user->id,
+            'original_url' => 'https://www.example.com',
+        ]);
+
+        $response = $this->get("/dashboard/analytics/{$link->id}?period=7d&bot_enabled=1");
+
+        $response->assertStatus(200);
+        $response->assertViewHas('includeBots', true);
+    }
+
     public function test_should_fallback_to_default_period_when_period_is_invalid(): void
     {
         $user = $this->authenticate();
@@ -66,6 +99,7 @@ class AnalyticsControllerTest extends TestCase {
 
         $response->assertStatus(200);
         $response->assertViewHas('selectedPeriod', '7d');
+        $response->assertViewHas('includeBots', false);
     }
 
     public function test_should_throws_an_not_found_error_if_url_does_not_exist() {
