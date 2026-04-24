@@ -3,10 +3,12 @@
 /* @noinspection PhpIllegalPsrClassPathInspection */
 namespace Tests\Feature\Jobs;
 
+use App\Events\QrCodeGenerated;
 use App\Jobs\GenerateQrCode;
 use App\Models\Url;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Tests\TestCase;
@@ -33,6 +35,8 @@ class GenerateQrCodeJobTest extends TestCase {
             'user_id' => $this->user->id,
         ]);
 
+        Event::fake([QrCodeGenerated::class]);
+
         QrCode::shouldReceive('generate')
             ->once()
             ->with(\Mockery::on(function ($argument) {
@@ -44,6 +48,10 @@ class GenerateQrCodeJobTest extends TestCase {
         $job = new GenerateQrCode($url);
 
         $job->handle();
+
+        Event::assertDispatched(QrCodeGenerated::class, function (QrCodeGenerated $event) use ($url) {
+            return $event->url->is($url->fresh()) && $event->url->qr_code === '<svg>QR CODE MOCK</svg>';
+        });
 
         $this->assertNotNull($url->fresh()->qr_code);
         $this->assertEquals('<svg>QR CODE MOCK</svg>', $url->fresh()->qr_code);

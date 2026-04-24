@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Events\QrCodeGenerated;
 use App\Models\Url;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -29,5 +30,6 @@ class GenerateQrCode implements ShouldQueue
         $qrcode = QrCode::generate($url);
         $this->urlShortened->qr_code = $qrcode;
         $this->urlShortened->save();
+        event(new QrCodeGenerated($this->urlShortened));
     }
 }

@@ -59,8 +59,8 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 
 ### 2.5 Filtro de Bots
 - [x] Identificar cliques de crawlers/robos conhecidos.
-- [ ] Marcar `is_bot` (ou ignorar no registro, conforme decisão de produto).
-- [ ] Permitir alternar no dashboard entre "incluir bots" e "excluir bots".
+- [x] Marcar `is_bot` (ou ignorar no registro, conforme decisão de produto).
+- [x] Permitir alternar no dashboard entre "incluir bots" e "excluir bots".
 
 ---
 
