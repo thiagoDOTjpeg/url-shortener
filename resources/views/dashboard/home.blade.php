@@ -14,20 +14,72 @@
         <div x-data="{
             isDialogOpen: false,
             isDeleteDialogOpen: false,
+            isQrCodeDialogOpen: false,
             deleteId: null,
             qrCodeSvg: null,
+            activeQrCodeId: null,
+            qrCodeStatus: null,
             copiedId: null,
-            clicks: {{ json_encode($links->pluck('click_count', 'id')) }},
+            echoListenerAttached: false,
+            userId: {{ \Illuminate\Support\Js::from(auth()->id()) }},
+            qrCodes: {{ \Illuminate\Support\Js::from($links->mapWithKeys(fn ($link) => [$link->id => $link->qr_code])) }},
+            clicks: {{ \Illuminate\Support\Js::from($links->pluck('click_count', 'id')) }},
             copy(text, id) {
                 navigator.clipboard.writeText(text);
                 this.copiedId = id;
                 setTimeout(() => this.copiedId = null, 2000);
             },
             openLink(id, url) {
-                this.clicks[id]++;
+                this.clicks[id] = Number(this.clicks[id] || 0) + 1;
                 window.open(url, '_blank');
+            },
+            openQrCode(id) {
+                this.activeQrCodeId = id;
+                this.qrCodeSvg = this.qrCodes[id] || null;
+                this.qrCodeStatus = this.qrCodeSvg ? 'QR Code pronto' : 'Gerando QR Code...';
+                this.isQrCodeDialogOpen = true;
+            },
+            closeQrCode() {
+                this.isQrCodeDialogOpen = false;
+                this.activeQrCodeId = null;
+                this.qrCodeSvg = null;
+                this.qrCodeStatus = null;
+            },
+            listenForQrCodeUpdates(retryCount = 0) {
+                if (!this.userId) {
+                    return;
+                }
+
+                if (!window.Echo) {
+                    if (retryCount < 20) {
+                        setTimeout(() => this.listenForQrCodeUpdates(retryCount + 1), 250);
+                    }
+
+                    return;
+                }
+
+                if (this.echoListenerAttached) {
+                    return;
+                }
+
+                this.echoListenerAttached = true;
+                window.Echo.private(`App.Models.User.${this.userId}`)
+                    .listen('.qr-code-event', (event) => {
+                        const link = event?.url;
+
+                        if (!link?.id || !link?.qr_code) {
+                            return;
+                        }
+
+                        this.qrCodes[link.id] = link.qr_code;
+
+                        if (this.activeQrCodeId === link.id) {
+                            this.qrCodeSvg = link.qr_code;
+                            this.qrCodeStatus = 'QR Code pronto';
+                        }
+                    });
             }
-        }">
+        }" x-init="listenForQrCodeUpdates()">
             <div class="flex items-center justify-between mb-8">
                 <div>
                     <h1 class="text-2xl font-medium mb-1">Seus links</h1>
@@ -48,15 +100,15 @@
                 </div>
                 <div class="bg-secondary/50 rounded-lg p-4 border border-border/50">
                     <p class="text-sm text-muted-foreground mb-1">Total de cliques</p>
-                    <p class="text-2xl font-medium" x-text="Object.values(clicks).reduce((a, b) => a + b, 0)"></p>
+                    <p class="text-2xl font-medium" x-text="Object.values(clicks).reduce((a, b) => Number(a) + Number(b || 0), 0)"></p>
                 </div>
                 <div class="bg-secondary/50 rounded-lg p-4 border border-border/50">
                     <p class="text-sm text-muted-foreground mb-1">Média por link</p>
-                    <p class="text-2xl font-medium" x-text="Object.keys(clicks).length > 0 ? Math.round(Object.values(clicks).reduce((a, b) => a + b, 0) / Object.keys(clicks).length) : 0"></p>
+                    <p class="text-2xl font-medium" x-text="Object.keys(clicks).length > 0 ? Math.round(Object.values(clicks).reduce((a, b) => Number(a) + Number(b || 0), 0) / Object.keys(clicks).length) : 0"></p>
                 </div>
                 <div class="bg-secondary/50 rounded-lg p-4 border border-border/50">
                     <p class="text-sm text-muted-foreground mb-1">Mais popular</p>
-                    <p class="text-2xl font-medium" x-text="Math.max(...Object.values(clicks), 0)"></p>
+                    <p class="text-2xl font-medium" x-text="Math.max(...Object.values(clicks).map(value => Number(value || 0)), 0)"></p>
                 </div>
             </div>
 
@@ -99,9 +151,13 @@
                                         <p class="text-xs text-muted-foreground">Criado em {{ $link->created_at->format('d/m/Y') }}</p>
                                     </div>
                                     <div class="flex items-center gap-1">
+                                        <span class="hidden lg:inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground bg-secondary">
+                                            <span x-text="qrCodes['{{ $link->id }}'] ? 'QR pronto' : 'Gerando QR' "></span>
+                                        </span>
+
                                         <x-button variant="ghost"
                                                   size="icon"
-                                                  x-on:click='qrCodeSvg = {{ \Illuminate\Support\Js::from($link->qr_code) }}'
+                                                  x-on:click="openQrCode('{{ $link->id }}')"
                                         >
                                             <x-lucide-qr-code class="h-4 w-4" />
                                         </x-button>
@@ -167,13 +223,26 @@
                 </div>
             </div>
 
-            <div x-show="qrCodeSvg" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" x-cloak x-transition>
-                <div class="bg-background border border-border rounded-lg p-6 max-w-sm w-full relative" @click.outside="qrCodeSvg = null">
-                    <button @click="qrCodeSvg = null" class="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
+            <div x-show="isQrCodeDialogOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" x-cloak x-transition>
+                <div class="bg-background border border-border rounded-lg p-6 max-w-sm w-full relative" @click.outside="closeQrCode()">
+                    <button @click="closeQrCode()" class="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
                         <x-lucide-x class="h-5 w-5" />
                     </button>
                     <h3 class="text-lg font-medium mb-2 text-center">QR Code</h3>
-                    <div class="bg-white p-4 rounded-lg border border-border mt-4 flex items-center justify-center" x-html="qrCodeSvg"></div>
+                    <p class="text-xs text-muted-foreground text-center" x-text="qrCodeStatus"></p>
+
+                    <div class="bg-white p-4 rounded-lg border border-border mt-4 flex items-center justify-center min-h-44">
+                        <template x-if="qrCodeSvg">
+                            <div x-html="qrCodeSvg"></div>
+                        </template>
+
+                        <template x-if="!qrCodeSvg">
+                            <div class="text-center">
+                                <p class="text-sm font-medium mb-1">Gerando QR Code...</p>
+                                <p class="text-xs text-muted-foreground">O código aparece automaticamente assim que o processamento terminar.</p>
+                            </div>
+                        </template>
+                    </div>
                 </div>
             </div>
 
