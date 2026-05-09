@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\LinkClicked;
 use App\Jobs\TrackClick;
 use App\Models\Url;
 use Carbon\Carbon;

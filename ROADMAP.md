@@ -68,9 +68,9 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 **Prioridade:** Media
 
 ### 3.1 QR Code Feedback em Tempo Real
-- [ ] Notificar frontend via WebSocket quando `GenerateQrCode` finalizar.
-- [ ] Atualizar estado da tela sem refresh manual.
-- [ ] Tratar reconexão e estado de erro no frontend.
+- [x] Notificar frontend via WebSocket quando `GenerateQrCode` finalizar.
+- [x] Atualizar estado da tela sem refresh manual.
+- [x] Tratar reconexão e estado de erro no frontend.
 
 ### 3.2 Live Dashboard
 - [ ] Atualizar contador de cliques em tempo real.
@@ -79,7 +79,7 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 
 ---
 
-## Fase 4 - Arquitetura e Documentacao
+## Fase 4 - Arquitetura e Documentação
 **Prioridade:** Media
 
 ### 5.1 Refatoração para Actions
