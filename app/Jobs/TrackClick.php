@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Events\LinkClicked;
 use App\Models\Url;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -41,7 +42,7 @@ class TrackClick implements ShouldQueue
 
         $position = Location::get($this->ip) ?: null;
 
-        $url->clicks()->create([
+        $click = $url->clicks()->create([
             'ip_address' => $this->ip,
             'user_agent' => $this->userAgent,
             'referer' => $this->referer,
@@ -57,5 +58,6 @@ class TrackClick implements ShouldQueue
 
         $url->increment('click_count');
         $url->update();
+        event(new LinkClicked($click));
     }
 }

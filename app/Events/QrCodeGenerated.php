@@ -13,7 +13,7 @@ class QrCodeGenerated implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public Url $url;
+    private readonly Url $url;
 
     /**
      * Create a new event instance.
