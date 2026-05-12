@@ -28,7 +28,7 @@ class LinkClicked implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('App.Models.User.' . $this->click->url->user_id),
+            new PrivateChannel('App.Models.UrlClick.' . $this->click->url_id),
         ];
     }
 

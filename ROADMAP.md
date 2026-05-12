@@ -73,9 +73,9 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 - [x] Tratar reconexão e estado de erro no frontend.
 
 ### 3.2 Live Dashboard
-- [ ] Atualizar contador de cliques em tempo real.
-- [ ] Atualizar gráficos em tempo real ao registrar novo acesso.
-- [ ] Garantir que eventos enviados respeitam permissao/escopo do usuário.
+- [x] Atualizar contador de cliques em tempo real.
+- [x] Atualizar gráficos em tempo real ao registrar novo acesso.
+- [x] Garantir que eventos enviados respeitam permissao/escopo do usuário.
 
 ---
 
@@ -101,7 +101,7 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 
 ## Milestones sugeridas
 - [x] **M1 (Seguranca):** concluir Fase 1
-- [ ] **M2 (Dados):** concluir Fase 2
+- [x] **M2 (Dados):** concluir Fase 2
 - [ ] **M3 (Realtime):** concluir Fase 3
 - [ ] **M4 (Infra):** concluir Fase 4
 - [ ] **M5 (Arquitetura + Docs):** concluir Fase 5

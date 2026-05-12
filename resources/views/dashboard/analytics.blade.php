@@ -149,7 +149,7 @@
                 }
 
                 this.echoListenerAttached = true;
-                window.Echo.private(`App.Models.User.${this.userId}`)
+                window.Echo.private(`App.Models.UrlClick.${ {{ $link->id }} }`)
                     .listen('.link-clicked', (event) => {
                         const click = event.linkClicked;
                         if (click && click.url_id === '{{ $link->id }}') {
