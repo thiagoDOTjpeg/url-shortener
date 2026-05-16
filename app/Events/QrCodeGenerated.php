@@ -31,7 +31,7 @@ class QrCodeGenerated implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('App.Models.User.' . $this->url->user_id),
+            new PrivateChannel('App.Models.User.'.$this->url->user_id),
         ];
     }
 

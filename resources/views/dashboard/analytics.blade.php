@@ -31,92 +31,155 @@
 <x-layouts.app>
     <x-slot:title>Analytics - {{ $link->id }}</x-slot:title>
 
-    <div class="flex flex-col max-w-7xl m-auto my-12">
-        <div x-data="{
-            copied: false,
-            echoListenerAttached: false,
-            userId: {{ \Illuminate\Support\Js::from(auth()->id()) }},
-            totalClicks: {{ \Illuminate\Support\Js::from($totalClicks) }},
-            chartInstances: { clicksChart: null, hoursChart: null },
-            clicksOverTime: {{ \Illuminate\Support\Js::from($clicksOverTime->toArray()) }},
-            clicksByHour: {{ \Illuminate\Support\Js::from($clicksByHour->toArray()) }},
-            recentClicks: {{ \Illuminate\Support\Js::from($recentClicks) }},
-            topCountries: {{ \Illuminate\Support\Js::from($topCountries) }},
-            heatmap: {{ \Illuminate\Support\Js::from($heatmap) }},
-            includeBots: {{ \Illuminate\Support\Js::from($includeBots) }},
+     <div class="flex flex-col max-w-7xl m-auto my-12">
+         <div x-data="{
+             copied: false,
+             echoListenerAttached: false,
+             userId: {{ \Illuminate\Support\Js::from(auth()->id()) }},
+             totalClicks: {{ \Illuminate\Support\Js::from($totalClicks) }},
+             clicksOverTime: Alpine.reactive({{ \Illuminate\Support\Js::from($clicksOverTime->toArray()) }}),
+             clicksByHour: Alpine.reactive({{ \Illuminate\Support\Js::from($clicksByHour->toArray()) }}),
+             recentClicks: {{ \Illuminate\Support\Js::from($recentClicks->toArray()) }},
+             topCountries: {{ \Illuminate\Support\Js::from($topCountries->toArray()) }},
+             heatmap: Alpine.reactive({{ \Illuminate\Support\Js::from($heatmap) }}),
+             includeBots: {{ \Illuminate\Support\Js::from($includeBots) }},
+             get topCountry() {
+                 return this.topCountries.length > 0 ? this.topCountries[0].country : 'N/A';
+             },
+             get topBrowser() {
+                  const browsers = {};
+                  this.recentClicks.forEach(c => {
+                      if (c.browser) {
+                          browsers[c.browser] = (browsers[c.browser] || 0) + 1;
+                      }
+                  });
+                  if (Object.keys(browsers).length === 0) return 'N/A';
+                  return Object.keys(browsers).reduce((a, b) => browsers[a] > browsers[b] ? a : b);
+              },
+             get uniqueCountries() {
+                 return this.topCountries.length;
+             },
             copy() {
                 navigator.clipboard.writeText('{{ $baseUrl }}/r/{{ $link->id }}');
                 this.copied = true;
                 setTimeout(() => this.copied = false, 2000);
             },
-            getDateKey(date) {
-                return new Date(date).toLocaleDateString('pt-BR');
-            },
-            getHourKey(date) {
-                return String(new Date(date).getHours()).padStart(2, '0') + ':00';
-            },
-            updateChartsData() {
-                if (this.chartInstances.clicksChart && this.clicksOverTime) {
-                    const labels = Object.keys(this.clicksOverTime);
-                    const data = Object.values(this.clicksOverTime).map(v => Number(v) || 0);
-                    this.chartInstances.clicksChart.data.labels = labels.length ? labels : ['Sem dados'];
-                    this.chartInstances.clicksChart.data.datasets[0].data = data.length ? data : [0];
-                    this.chartInstances.clicksChart.update();
-                }
-                if (this.chartInstances.hoursChart && this.clicksByHour) {
-                    const labels = Object.keys(this.clicksByHour);
-                    const data = Object.values(this.clicksByHour).map(v => Number(v) || 0);
-                    this.chartInstances.hoursChart.data.labels = labels;
-                    this.chartInstances.hoursChart.data.datasets[0].data = data;
-                    this.chartInstances.hoursChart.update();
-                }
-            },
-            handleClickEvent(click) {
-                this.totalClicks++;
+             getDateKey(date) {
+                 try {
+                     const dateObj = typeof date === 'string' ? new Date(date) : date;
+                     if (isNaN(dateObj.getTime())) {
+                         return 'Invalid';
+                     }
+                     return dateObj.toLocaleDateString('pt-BR');
+                 } catch (e) {
+                     return 'Invalid';
+                 }
+             },
+             getHourKey(date) {
+                 try {
+                     const dateObj = typeof date === 'string' ? new Date(date) : date;
+                     if (isNaN(dateObj.getTime())) {
+                         return '00:00';
+                     }
+                     return String(dateObj.getHours()).padStart(2, '0') + ':00';
+                 } catch (e) {
+                     return '00:00';
+                 }
+             },
+              updateChartsData() {
+                  const charts = window.chartsInstance || {};
 
-                const dateKey = this.getDateKey(click.clicked_at);
-                this.clicksOverTime[dateKey] = (this.clicksOverTime[dateKey] || 0) + 1;
+                  if (charts.clicksChart && this.clicksOverTime) {
+                      const labels = Object.keys(this.clicksOverTime).filter(l => l !== 'Invalid');
+                      const data = labels.map(label => {
+                          const num = Number(this.clicksOverTime[label]) || 0;
+                          return isNaN(num) ? 0 : num;
+                      });
 
-                const hourKey = this.getHourKey(click.clicked_at);
-                this.clicksByHour[hourKey] = (this.clicksByHour[hourKey] || 0) + 1;
+                      charts.clicksChart.data.labels = labels.length ? labels : ['Sem dados'];
+                      charts.clicksChart.data.datasets[0].data = data.length ? data : [0];
+                      charts.clicksChart.update('active');
+                  }
 
-                this.recentClicks.unshift({
-                    country: click.country || 'Desconhecido',
-                    clicked_at: click.clicked_at,
-                    browser: click.browser || 'N/A',
-                    from: click.from || 'Direct'
-                });
-                if (this.recentClicks.length > 10) {
-                    this.recentClicks.pop();
-                }
+                  if (charts.hoursChart && this.clicksByHour) {
+                      const labels = Object.keys(this.clicksByHour)
+                          .filter(l => l !== 'Invalid' && l !== '00:00')
+                          .sort((a, b) => parseInt(a) - parseInt(b));
 
-                if (click.country) {
-                    const countryIndex = this.topCountries.findIndex(c => c.country === click.country);
-                    if (countryIndex !== -1) {
-                        this.topCountries[countryIndex].clicks++;
-                    } else {
-                        this.topCountries.push({
-                            country: click.country,
-                            clicks: 1,
-                            percentage: 0
-                        });
-                    }
+                      const data = labels.map(label => {
+                          const num = Number(this.clicksByHour[label]) || 0;
+                          return isNaN(num) ? 0 : num;
+                      });
 
-                    const totalCountryClicks = this.topCountries.reduce((sum, c) => sum + c.clicks, 0);
-                    this.topCountries.forEach(c => {
-                        c.percentage = Math.round((c.clicks / totalCountryClicks) * 100);
-                    });
+                      charts.hoursChart.data.labels = labels.length ? labels : ['Sem dados'];
+                      charts.hoursChart.data.datasets[0].data = data.length ? data : [0];
+                      charts.hoursChart.update('active');
+                  }
+              },
+             handleClickEvent(click) {
+                 this.totalClicks++;
 
-                    const countryCode = click.country;
-                    if (countryCode) {
-                        const maxClicks = Math.max(...this.topCountries.map(c => c.clicks));
-                        this.heatmap[countryCode] = (this.topCountries.find(c => c.country === countryCode)?.clicks || 0) / maxClicks;
-                        this.updateHeatmap();
-                    }
-                }
+                 if (!click.clicked_at) {
+                     console.warn('Click com data inválida:', click);
+                     return;
+                 }
 
-                this.$nextTick(() => this.updateChartsData());
-            },
+                 const dateKey = this.getDateKey(click.clicked_at);
+                 if (dateKey !== 'Invalid') {
+                     const newClicks = Object.assign({}, this.clicksOverTime, {
+                         [dateKey]: (this.clicksOverTime[dateKey] || 0) + 1
+                     });
+                     this.clicksOverTime = newClicks;
+                 }
+
+                 const hourKey = this.getHourKey(click.clicked_at);
+                 if (hourKey !== '00:00' || Object.keys(this.clicksByHour).length === 0) {
+                     const newHours = Object.assign({}, this.clicksByHour, {
+                         [hourKey]: (this.clicksByHour[hourKey] || 0) + 1
+                     });
+                     this.clicksByHour = newHours;
+                 }
+
+                 this.recentClicks.unshift({
+                     country: click.country || 'Desconhecido',
+                     clicked_at: click.clicked_at,
+                     browser: click.browser || 'N/A',
+                     from: click.from || 'Direct'
+                 });
+                 if (this.recentClicks.length > 50) {
+                     this.recentClicks.pop();
+                 }
+
+                 if (click.country) {
+                     const countryIndex = this.topCountries.findIndex(c => c.country === click.country);
+                     if (countryIndex !== -1) {
+                         this.topCountries[countryIndex].clicks++;
+                         this.topCountries.sort((a, b) => b.clicks - a.clicks);
+                     } else {
+                         this.topCountries.push({
+                             country: click.country,
+                             clicks: 1,
+                             percentage: 0
+                         });
+                         this.topCountries.sort((a, b) => b.clicks - a.clicks);
+                     }
+
+                     const totalCountryClicks = this.topCountries.reduce((sum, c) => sum + c.clicks, 0);
+                     this.topCountries.forEach(c => {
+                         c.percentage = Math.round((c.clicks / totalCountryClicks) * 100);
+                     });
+
+                     const countryCode = click.country;
+                     if (countryCode) {
+                         const maxClicks = Math.max(...this.topCountries.map(c => c.clicks));
+                         const newHeatmap = Object.assign({}, this.heatmap, {
+                             [countryCode]: (this.topCountries.find(c => c.country === countryCode)?.clicks || 0) / maxClicks
+                         });
+                         this.heatmap = newHeatmap;
+                         this.updateHeatmap();
+                     }
+                 }
+             },
             updateHeatmap() {
                 const mapContainer = this.$refs.mapContainer;
                 if (!mapContainer) return;
@@ -149,34 +212,47 @@
                 }
 
                 this.echoListenerAttached = true;
-                window.Echo.private(`App.Models.UrlClick.${ {{ $link->id }} }`)
+                window.Echo.private(`App.Models.UrlClick.{{ $link->id }}`)
                     .listen('.link-clicked', (event) => {
                         const click = event.linkClicked;
+
+                        if (!this.includeBots && click.is_bot) return
+
                         if (click && click.url_id === '{{ $link->id }}') {
-                            if (!this.includeBots && click.is_bot) {
-                                return;
-                            }
                             this.handleClickEvent(click);
                         }
                     });
             },
-            initCharts() {
-                document.addEventListener('chartsReady', (event) => {
-                    if (event.detail && event.detail.chartsInstance) {
-                        this.chartInstances = event.detail.chartsInstance;
-                    }
-                });
-            },
-            initHeatmap() {
-                this.$nextTick(() => {
-                    if (this.$refs.mapContainer) {
-                        this.updateHeatmap();
-                    }
-                });
-            }
+             initCharts() {
+                 let retries = 0;
+                 const checkCharts = setInterval(() => {
+                     if (window.chartsInstance && window.chartsInstance.clicksChart) {
+                         clearInterval(checkCharts);
+                     }
+                     if (retries++ > 50) clearInterval(checkCharts); // Parar após 5 segundos
+                 }, 100);
+             },
+             initHeatmap() {
+                 this.$nextTick(() => {
+                     if (this.$refs.mapContainer) {
+                         this.updateHeatmap();
+                     }
+                 });
+             },
+             initWatchers() {
+                 // Observar mudanças em clicksOverTime
+                 this.$watch('clicksOverTime', () => {
+                     this.$nextTick(() => this.updateChartsData());
+                 }, { deep: true });
+
+                 // Observar mudanças em clicksByHour
+                 this.$watch('clicksByHour', () => {
+                     this.$nextTick(() => this.updateChartsData());
+                 }, { deep: true });
+             }
 
              }"
-             x-init="listenForUrlClicks(); initCharts(); initHeatmap();">
+             x-init="listenForUrlClicks(); initCharts(); initHeatmap(); initWatchers();">
             <a href="{{ route('dashboard.home') }}"
                class="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
                 <x-lucide-arrow-left class="h-4 w-4"/>
@@ -271,7 +347,7 @@
             </template>
 
             <div :style="totalClicks === 0 ? 'display: none' : ''">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     <div class="bg-secondary/50 rounded-lg p-4 border border-border/50">
                         <div class="flex items-center gap-2 mb-2">
                             <x-lucide-mouse-pointer class="h-4 w-4 text-muted-foreground"/>
@@ -281,29 +357,24 @@
                     </div>
                     <div class="bg-secondary/50 rounded-lg p-4 border border-border/50">
                         <div class="flex items-center gap-2 mb-2">
-                            <x-lucide-clock class="h-4 w-4 text-muted-foreground"/>
-                            <p class="text-sm text-muted-foreground">Criado em</p>
-                        </div>
-                        <p class="text-3xl font-medium">{{ Carbon::parse($link->created_at)->format('d/m/Y') }}</p>
-                    </div>
-                    <div class="bg-secondary/50 rounded-lg p-4 border border-border/50">
-                        <div class="flex items-center gap-2 mb-2">
                             <x-lucide-globe class="h-4 w-4 text-muted-foreground"/>
-                            <p class="text-sm text-muted-foreground">Países</p>
+                            <p class="text-sm text-muted-foreground">Países únicos</p>
                         </div>
-                        <p class="text-3xl font-medium" x-text="topCountries.length"></p>
+                        <p class="text-3xl font-medium" x-text="uniqueCountries"></p>
                     </div>
                     <div class="bg-secondary/50 rounded-lg p-4 border border-border/50">
                         <div class="flex items-center gap-2 mb-2">
-                            <x-lucide-clock class="h-4 w-4 text-muted-foreground"/>
-                            <p class="text-sm text-muted-foreground">Tempo restante</p>
+                            <x-lucide-flag class="h-4 w-4 text-muted-foreground"/>
+                            <p class="text-sm text-muted-foreground">Top país</p>
                         </div>
-                        <p class="text-2xl font-medium leading-tight">
-                            {{ $remainingExpirationLabel }}
-                        </p>
-                        @if($hasExpiration)
-                            <p class="text-xs text-muted-foreground mt-1">Data: {{ $expirationDateLabel }}</p>
-                        @endif
+                        <p class="text-2xl font-medium truncate" x-text="topCountry"></p>
+                    </div>
+                    <div class="bg-secondary/50 rounded-lg p-4 border border-border/50">
+                        <div class="flex items-center gap-2 mb-2">
+                            <x-lucide-monitor class="h-4 w-4 text-muted-foreground"/>
+                            <p class="text-sm text-muted-foreground">Top navegador</p>
+                        </div>
+                        <p class="text-2xl font-medium truncate" x-text="topBrowser"></p>
                     </div>
                 </div>
 
@@ -351,7 +422,7 @@
                     <div class="border border-border rounded-lg p-5 bg-card">
                         <h2 class="font-medium mb-1">Cliques recentes</h2>
                         <p class="text-sm text-muted-foreground mb-4">Acessos em {{ strtolower($selectedPeriodLabel) }}</p>
-                        <div class="divide-y divide-border">
+                        <div class="divide-y divide-border max-h-96 overflow-y-auto">
                             <template x-for="click in recentClicks" :key="click.clicked_at">
                                 <div class="py-2.5 flex items-center justify-between">
                                     <div>
