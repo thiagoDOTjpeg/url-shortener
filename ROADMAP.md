@@ -102,7 +102,7 @@ Este roadmap organiza as proximas evolucoes do projeto em blocos incrementais, p
 ## Milestones sugeridas
 - [x] **M1 (Seguranca):** concluir Fase 1
 - [x] **M2 (Dados):** concluir Fase 2
-- [ ] **M3 (Realtime):** concluir Fase 3
+- [x] **M3 (Realtime):** concluir Fase 3
 - [ ] **M4 (Infra):** concluir Fase 4
 - [ ] **M5 (Arquitetura + Docs):** concluir Fase 5
 
