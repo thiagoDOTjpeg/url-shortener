@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Broadcast;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UrlController;
 use App\Http\Controllers\RedirectController;
@@ -8,6 +9,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\EmailController;
 use \Infinitypaul\Idempotency\Middleware\EnsureIdempotency;
+
+Broadcast::routes(['middleware' => ['web', 'auth']]);
 
 Route::get('/', function () {
     return view('app');

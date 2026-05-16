@@ -2,7 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Events\LinkClicked;
 use App\Models\Url;
+use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Jenssegers\Agent\Agent;
@@ -21,9 +23,7 @@ class TrackClick implements ShouldQueue
         public readonly string $userAgent,
         public readonly ?string $referer,
         public readonly string $from
-        )
-    {
-    }
+    ) {}
 
     /**
      * Execute the job.
@@ -32,7 +32,7 @@ class TrackClick implements ShouldQueue
     {
         $url = Url::findOrFail($this->slug);
 
-        $agent = new Agent();
+        $agent = new Agent;
         $agent->setUserAgent($this->userAgent);
         $browser = $agent->browser();
         $os = $agent->platform();
@@ -41,7 +41,7 @@ class TrackClick implements ShouldQueue
 
         $position = Location::get($this->ip) ?: null;
 
-        $url->clicks()->create([
+        $click = $url->clicks()->create([
             'ip_address' => $this->ip,
             'user_agent' => $this->userAgent,
             'referer' => $this->referer,
@@ -53,9 +53,11 @@ class TrackClick implements ShouldQueue
             'browser' => $browser,
             'os' => $os,
             'device_type' => $device,
+            'clicked_at' => Carbon::now(),
         ]);
 
         $url->increment('click_count');
         $url->update();
+        event(new LinkClicked($click));
     }
 }

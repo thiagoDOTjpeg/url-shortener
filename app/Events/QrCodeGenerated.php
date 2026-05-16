@@ -13,7 +13,7 @@ class QrCodeGenerated implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public Url $url;
+    private readonly Url $url;
 
     /**
      * Create a new event instance.
@@ -31,7 +31,7 @@ class QrCodeGenerated implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('App.Models.User.' . $this->url->user_id),
+            new PrivateChannel('App.Models.User.'.$this->url->user_id),
         ];
     }
 
